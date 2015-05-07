@@ -282,25 +282,7 @@ class RetargetingTracker extends Module
 	*/
 	public function hookActionAuthentication()
 	{
-		
-		$customer = $this->context->customer;
-
-		$js_code = '/* login */
-			var _ra = _ra || {};
-			_ra.setEmailInfo = {
-				"email": "'.$customer->email.'",
-				"name": "'.$customer->firstname.' '.$customer->lastname.'",
-				"phone": "",
-				"city": "",
-				"sex": "'.$customer->id_gender.'"
-			};
-			
-			if (_ra.ready !== undefined) {
-				_ra.setEmail(_ra.setEmailInfo)
-			}
-		';
-
-		$this->context->cookie->ra_setEmail = serialize(urlencode($js_code));
+		$this->prepSetEmailJS();
 	}
 
 	/**
@@ -308,6 +290,10 @@ class RetargetingTracker extends Module
 	*/
 	public function hookActionCustomerAccountAdd()
 	{
+		$this->prepSetEmailJS();
+	}
+
+	protected function prepSetEmailJS() {
 		$customer = $this->context->customer;
 
 		$js_code = '/* register */
