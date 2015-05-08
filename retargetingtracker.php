@@ -1,4 +1,28 @@
 <?php
+/**
+ * 2014-2015 Retargeting SRL
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to info@retargeting.biz so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author    Retargeting SRL <info@retargeting.biz>
+ * @copyright 2014-2015 Retargeting SRL
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
 if (!defined('_PS_VERSION_'))
 	exit;
 
@@ -10,9 +34,9 @@ class RetargetingTracker extends Module
 		$this->tab = 'analytics_stats';
 		$this->version = '1.0.0';
 		$this->author = 'Cosmin Atomei';
+		$this->module_key = '07f632866f76537ce3f8f01eedad4f00';
 		$this->need_instance = 0;
 		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_); 
-		$this->bootstrap = true;
 
 		parent::__construct();
 
@@ -21,14 +45,17 @@ class RetargetingTracker extends Module
 
 		$this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-		if (!Configuration::get('retargetingtracker_apikey') || 
+		if (!Configuration::get('retargetingtracker_apikey') ||
 			Configuration::get('retargetingtracker_apikey') == '') 
 			$this->warning = $this->l('No Domain API Key provided');
+
+		/* Backward compatibility */
+		if (_PS_VERSION_ < '1.5')
+			require(_PS_MODULE_DIR_.$this->name.'/backward_compatibility/backward.php');
 	}
 
 	public function install()
 	{
-
 		if (Shop::isFeatureActive()) Shop::setContext(Shop::CONTEXT_ALL);
 		
 		return parent::install() &&
@@ -44,9 +71,9 @@ class RetargetingTracker extends Module
 
 	public function uninstall()
 	{
-		return Configuration::deleteByName('retargetingtracker_apikey') && 
-			Configuration::deleteByName('retargetingtracker_discountApikey') && 
-			Configuration::deleteByName('retargetingtracker_opt_visitHelpPage') && 
+		return Configuration::deleteByName('retargetingtracker_apikey') &&
+			Configuration::deleteByName('retargetingtracker_discountApikey') &&
+			Configuration::deleteByName('retargetingtracker_opt_visitHelpPage') &&
 			parent::uninstall();
 	}
 
@@ -56,8 +83,8 @@ class RetargetingTracker extends Module
 
 		if (Tools::isSubmit('submitBasicSettings'))
 		{
-			$ra_apikey = strval(Tools::getValue('retargetingtracker_apikey'));
-			$ra_discountsApikey = strval(Tools::getValue('retargetingtracker_discountApikey'));
+			$ra_apikey = (string)Tools::getValue('retargetingtracker_apikey');
+			$ra_discountsApikey = (string)Tools::getValue('retargetingtracker_discountApikey');
 			
 			Configuration::updateValue('retargetingtracker_apikey', $ra_apikey);
 			Configuration::updateValue('retargetingtracker_discountApikey', $ra_discountsApikey);
@@ -68,9 +95,10 @@ class RetargetingTracker extends Module
 		{
 			$ra_opt_visitHelpPages = array();
 
-			foreach (CMS::listCMS() as $key => $cmsPage) {
-				$option = Tools::getValue('retargetingtracker_opt_visitHelpPage_' . $cmsPage['id_cms']);
-				if ($option == "on") $ra_opt_visitHelpPages[] = $cmsPage['id_cms'];
+			foreach (CMS::listCMS() as $cmsPage)
+			{
+				$option = (string)Tools::getValue('retargetingtracker_opt_visitHelpPage_'.$cmsPage['id_cms']);
+				if ($option == 'on') $ra_opt_visitHelpPages[] = $cmsPage['id_cms'];
 			}
 			
 			Configuration::updateValue('retargetingtracker_opt_visitHelpPage', implode('|', $ra_opt_visitHelpPages));
@@ -86,6 +114,8 @@ class RetargetingTracker extends Module
 		$default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 
 		// Init Fields form array
+		$fields_form = array();
+
 		$fields_form[0]['form'] = array(
 			'legend' => array(
 				'title' => $this->l('Basic Settings'),
@@ -109,6 +139,7 @@ class RetargetingTracker extends Module
 				'title' => $this->l('Save')
 			)
 		);
+
 		$fields_form[1]['form'] = array(
 			'legend' => array(
 				'title' => $this->l('Tracker Options'),
@@ -167,14 +198,16 @@ class RetargetingTracker extends Module
 		$helper->fields_value['retargetingtracker_discountApikey'] = Configuration::get('retargetingtracker_discountApikey');
 		
 		$options_visitHelpPages = explode('|', Configuration::get('retargetingtracker_opt_visitHelpPage'));
-		foreach ($options_visitHelpPages as $key => $option) {
-			$helper->fields_value['retargetingtracker_opt_visitHelpPage_' . $option] = true;
-		}
+		foreach ($options_visitHelpPages as $option) 
+			$helper->fields_value['retargetingtracker_opt_visitHelpPage_'.$option] = true;
 
 		return $helper->generateForm($fields_form);
 	}
 
-	// embedding
+	/**
+	* Triggers Embedding
+	* ----------------------------------------------------------
+	*/
 	public function hookHeader()
 	{
 		$this->controller = Dispatcher::getInstance()->getController();
@@ -185,42 +218,42 @@ class RetargetingTracker extends Module
 		if (!$js_code) return;
 		
 		// setEmail
-		if (isset($this->context->cookie->ra_setEmail))
+		if ($this->context->cookie->ra_setEmail != '')
 		{
 			$js_code .= urldecode(unserialize($this->context->cookie->ra_setEmail));
 			unset($this->context->cookie->ra_setEmail);
 		}
 
 		// sendCategory
-		if ($this->controller == "category")
+		if ($this->controller == 'category')
 		{
 			$js_sendCategory = $this->_assignSendCategory();
 			$js_code .= $js_sendCategory;
 		}
 
 		// sendBrand
-		if ($this->controller == "manufacturer")
+		if ($this->controller == 'manufacturer')
 		{
 			$js_sendBrand = $this->_assignSendBrand();
 			$js_code .= $js_sendBrand;
 		}
 
 		// sendProduct
-		if ($this->controller == "product")
+		if ($this->controller == 'product')
 		{
 			$js_sendProduct = $this->_assignSendProduct();
 			$js_code .= $js_sendProduct;
 		}
 
 		// visitHelpPages
-		if ($this->controller == "cms")
+		if ($this->controller == 'cms')
 		{
 			$js_visitHelpPage = $this->_assignVisitHelpPage();
 			$js_code .= $js_visitHelpPage;
 		}
 
 		// checkoutIds
-		if ($this->controller == "order")
+		if ($this->controller == 'order')
 		{
 			$js_checkoutIds = $this->_assignCheckoutIds();
 			$js_code .= $js_checkoutIds;
@@ -238,7 +271,7 @@ class RetargetingTracker extends Module
 		$js_code .= $js_addToWishlist;
 
 		// setVariation, clickImage, commentOnProduct, mouseOverPrice, mouseOverAddToCart, likeFacebook
-		if ($this->controller == "product") 
+		if ($this->controller == 'product') 
 		{
 			// setVariation
 			$js_setVariation = $this->_assignSetVariation();
@@ -274,7 +307,7 @@ class RetargetingTracker extends Module
 
 	/**
 	* Specific hooks
-	* --------------------------------------------------------------
+	* ----------------------------------------------------------
 	*/
 
 	/**
@@ -293,11 +326,11 @@ class RetargetingTracker extends Module
 		$this->prepSetEmailJS();
 	}
 
-	protected function prepSetEmailJS() {
+	protected function prepSetEmailJS()
+	{
 		$customer = $this->context->customer;
 
-		$js_code = '/* register */
-			var _ra = _ra || {};
+		$js_code = 'var _ra = _ra || {};
 			_ra.setEmailInfo = {
 				"email": "'.$customer->email.'",
 				"name": "'.$customer->firstname.' '.$customer->lastname.'",
@@ -341,7 +374,7 @@ class RetargetingTracker extends Module
 			if (count($discounts) > 0)
 			{	
 				$discountsCode = array();
-				foreach ($discounts as $key => $discount)
+				foreach ($discounts as $discount)
 				{
 					$cartRule = new CartRule((int)$discount['id_cart_rule']);
 					$discountsCode[] = $cartRule->code;
@@ -377,6 +410,7 @@ class RetargetingTracker extends Module
 
 	/**
 	* Functions _assign[::retargeting_trigger::]
+	* ----------------------------------------------------------
 	*/
 
 	protected function _assignEmbedding()
@@ -402,7 +436,6 @@ class RetargetingTracker extends Module
 	protected function _assignSendCategory()
 	{
 		$category_instance = $this->context->controller->getCategory();
-		$category_fields = $category_instance->getFields();
 		
 		$js_category = array();
 		$arr_categoryBreadcrumb = array();
@@ -441,9 +474,9 @@ class RetargetingTracker extends Module
 
 		$brand_instance = $this->context->controller->getManufacturer();
 		
-		if (isset($brand_instance))
+		if ($brand_instance != '')
 		{
-			$js_code = 'var _ra = _ra || {};
+			$js_code .= 'var _ra = _ra || {};
 				_ra.sendBrandInfo = {
 					"id": "'.$brand_instance->id_manufacturer.'",
 					"name": "'.$brand_instance->name.'"
@@ -465,7 +498,7 @@ class RetargetingTracker extends Module
 		$product_fields = $product_instance->getFields();
 		$category_instance = new Category($product_instance->id_category_default);   
 
-		$js_category = "false";
+		$js_category = 'false';
 		$arr_categoryBreadcrumb = array();
 
 		if (Validate::isLoadedObject($category_instance))
@@ -488,11 +521,11 @@ class RetargetingTracker extends Module
 				"id": "'.$product_fields['id_product'].'",
 				"name": "'.$product_instance->name.'",
 				"url": "'.$product_instance->getLink().'", 
-			  	"img": "'.$link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], 'large_default').'", 
+			  	"img": "'.$link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large')).'", 
 			  	"price": '.$product_instance->getPriceWithoutReduct(true, null, 2).',
 				"promo": '.($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0).',
-				"stock": '.($product_instance->available_now == "In stock" ? 1 : 0).',
-				"brand": '.($product_instance->manufacturer_name != "" ? '"'.$product_instance->manufacturer_name.'"' : "false").',
+				"stock": '.($product_instance->available_now == 'In stock' ? 1 : 0).',
+				"brand": '.($product_instance->manufacturer_name != '' ? '"'.$product_instance->manufacturer_name.'"' : 'false').',
 				"category": '.$js_category.',
 				"category_breadcrumb": '.$js_categoryBreadcrumb.'
 			};
@@ -670,9 +703,8 @@ class RetargetingTracker extends Module
 		$cartProducts = $cart_instance->getProducts();
 
 		$arr_cartProducts = array();
-		foreach ($cartProducts as $key => $product) {
+		foreach ($cartProducts as $product)
 			$arr_cartProducts[] = $product['id_product'];
-		}
 
 		$js_cartProducts = '['.implode(', ', $arr_cartProducts).']';
 
