@@ -174,7 +174,11 @@ if (Tools::getValue('ajax') == 'true' && Tools::getValue('method'))
 		if (Tools::getValue('type') == 'product' && Tools::getValue('vid')) die(getProductAddToCartJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
 		die(getThumbnailAddToCartJS((int)Tools::getValue('pid')));
 	}
-	else if (Tools::getValue('method') == 'getSetVariationJS' && Tools::getValue('pid') && Tools::getValue('vid')) die(getSetVariationJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
+	else if (Tools::getValue('method') == 'getSetVariationJS' && Tools::getValue('pid') && Tools::getValue('vid')) 
+	{
+		die(getSetVariationJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
+	}
+	else if (Tools::getValue('method') == '')
 	
 	die('ERROR : No valid method selected.');
 }

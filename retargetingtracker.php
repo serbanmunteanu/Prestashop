@@ -32,11 +32,12 @@ class RetargetingTracker extends Module
 	{
 		$this->name = 'retargetingtracker';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.0.0';
+		$this->version = '1.0.1';
 		$this->author = 'Cosmin Atomei';
 		$this->module_key = '07f632866f76537ce3f8f01eedad4f00';
 		$this->need_instance = 0;
 		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_); 
+		$this->bootstrap = true;
 
 		parent::__construct();
 
@@ -61,6 +62,8 @@ class RetargetingTracker extends Module
 		return parent::install() &&
 			Configuration::updateValue('retargetingtracker_apikey', '') &&
 			Configuration::updateValue('retargetingtracker_discountApikey', '') &&
+			Configuration::updateValue('retargetingtracker_productFeedUrl', '') &&
+			Configuration::updateValue('retargetingtracker_discountApiUrl', '') &&
 			Configuration::updateValue('retargetingtracker_opt_visitHelpPage', '') &&
 			$this->registerHook('displayHome') &&
 			$this->registerHook('displayHeader') &&
@@ -73,6 +76,8 @@ class RetargetingTracker extends Module
 	{
 		return Configuration::deleteByName('retargetingtracker_apikey') &&
 			Configuration::deleteByName('retargetingtracker_discountApikey') &&
+			Configuration::deleteByName('retargetingtracker_productFeedUrl') &&
+			Configuration::deleteByName('retargetingtracker_discountApiUrl') &&
 			Configuration::deleteByName('retargetingtracker_opt_visitHelpPage') &&
 			parent::uninstall();
 	}
@@ -125,13 +130,13 @@ class RetargetingTracker extends Module
 					'type' => 'text',
 					'label' => $this->l('Domain API Key'),
 					'name' => 'retargetingtracker_apikey',
-					'desc' => 'You can find your Secure Domain API Key in your <a href="http://www.retargeting.biz">Retargeting</a> account.'
+					'desc' => 'You can find your Secure Domain API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Discounts API Key'),
 					'name' => 'retargetingtracker_discountApikey',
-					'desc' => 'You can find your Secure Discount API Key in your <a href="http://www.retargeting.biz">Retargeting</a> account.'
+					'desc' => 'You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
 				),
 			),
 			'submit' => array(
@@ -141,6 +146,28 @@ class RetargetingTracker extends Module
 		);
 
 		$fields_form[1]['form'] = array(
+			'legend' => array(
+				'title' => $this->l('Specific URLs'),
+			),
+			'input' => array(
+				array(
+					'type' => 'text',
+					'label' => $this->l('Product Feed URL'),
+					'name' => 'retargetingtracker_productFeedUrl',
+					'desc' => '',
+					'disabled' => 'disabled'
+				),
+				array(
+					'type' => 'text',
+					'label' => $this->l('Discounts API URL'),
+					'name' => 'retargetingtracker_discountApiUrl',
+					'desc' => '',
+					'disabled' => 'disabled'
+				),
+			),
+		);
+
+		$fields_form[2]['form'] = array(
 			'legend' => array(
 				'title' => $this->l('Tracker Options'),
 			),
@@ -196,6 +223,9 @@ class RetargetingTracker extends Module
 		// Load current value
 		$helper->fields_value['retargetingtracker_apikey'] = Configuration::get('retargetingtracker_apikey');
 		$helper->fields_value['retargetingtracker_discountApikey'] = Configuration::get('retargetingtracker_discountApikey');
+		
+		$helper->fields_value['retargetingtracker_productFeedUrl'] = Configuration::get('retargetingtracker_productFeedUrl') != '' ? Configuration::get('retargetingtracker_productFeedUrl') : '/modules/retargetingtracker/productFeed.php';
+		$helper->fields_value['retargetingtracker_discountApiUrl'] = Configuration::get('retargetingtracker_discountApiUrl') != '' ? Configuration::get('retargetingtracker_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params';
 		
 		$options_visitHelpPages = explode('|', Configuration::get('retargetingtracker_opt_visitHelpPage'));
 		foreach ($options_visitHelpPages as $option) 
@@ -417,6 +447,7 @@ class RetargetingTracker extends Module
 	{
 		$js_embedd = false;
 
+		
 		$ra_domain_api_key = Configuration::get('retargetingtracker_apikey'); 
 		
 		if ($ra_domain_api_key && $ra_domain_api_key != '')
@@ -428,8 +459,18 @@ class RetargetingTracker extends Module
 				var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ra,s);})();
 			
 			';
+		} 
+		else 
+		{
+			
+			$js_embedd = '(function(){
+				var ra = document.createElement("script"); ra.type ="text/javascript"; ra.async = true; ra.src = ("https:" ==
+				document.location.protocol ? "https://" : "http://") + "retargeting-data.eu/" +
+				document.location.hostname.replace("www.","") + "/ra.js"; var s =
+				document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ra,s);})();
+			';
 		}
-
+		
 		return $js_embedd;
 	}
 
@@ -633,6 +674,7 @@ class RetargetingTracker extends Module
 		$product_fields = $product_instance->getFields();
 		
 		$js_code = 'function _ra_mouseOverPrice() {
+				if (typeof _ra.mouseOverPrice !== "function") return false;
 				_ra.mouseOverPrice("'.$product_fields['id_product'].'", {
 					"price": '.$product_instance->getPriceWithoutReduct(true, null, 2).',
 					"promo": '.($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0).'
@@ -651,6 +693,7 @@ class RetargetingTracker extends Module
 		$product_fields = $product_instance->getFields();
 
 		$js_code = 'function _ra_mouseOverAddToCart() {
+				if (typeof _ra.mouseOverAddToCart !== "function") return false;
 				_ra.mouseOverAddToCart("'.$product_fields['id_product'].'");
 			}
 
