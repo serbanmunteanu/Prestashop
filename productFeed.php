@@ -30,24 +30,51 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 echo '
 <products>';
 
-$ra_domain_api_key = Configuration::get('retargetingtracker_apikey'); 
+$ra_domain_api_key = Configuration::get('ra_apikey');
 
-if (Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_key)
+if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_key) || $ra_domain_api_key == 'allowFeed')
 {
-	$products = Product::getProducts((int)Context::getContext()->language->id, 0, 0, "id_product", "desc");
+	$products = Product::getProducts(1, 0, 0, "id_product", "desc");
 	foreach ($products as $product) {
 		$link_instance = new LinkCore();
 		$product_instance = new Product((int)$product['id_product']);
 		$product_fields = $product_instance->getFields();
+		
+		$product_image = '';
+		$id_image = Product::getCover($product_fields['id_product']);
+		if (sizeof($id_image) > 0) {
+			$image = new Image($id_image['id_image']);
+			if (_PS_VERSION_ >= '1.5')
+				$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath()."-".ImageType::getFormatedName('large').".jpg";
+			else
+				$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->id_product."-".$image->id_image."-large.jpg";
+		} else {
+			$product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
+		}
+
+		if (_PS_VERSION_ >= '1.5')
+		{
+			$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
+			$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
+
+			$product_stock = ($product_instance->available_now == 'In stock' ? 1 : 0);
+		}
+		else
+		{
+			$product_price = $product_instance->getPrice(true, null, 2, null, false, false);
+			$product_promo = ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2) ? $product_instance->getPrice(true, null, 2) : 0);
+
+			$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
+		}
 
 		echo '
 		<product>
 			<id>'.$product_fields['id_product'].'</id>
-			<stock>'.($product_instance->available_now[1] == 'In stock' ? 1 : 0).'</stock>
-			<price>'.$product_instance->getPriceWithoutReduct(true, null, 2).'</price>
-			<promo>'.($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0).'</promo>
+			<stock>'.$product_stock.'</stock>
+			<price>'.$product_price.'</price>
+			<promo>'.$product_promo.'</promo>
 			<url>'.$product_instance->getLink().'</url>
-			<image>'.$link_instance->getImageLink($product_instance->link_rewrite[1], $product_fields['id_product'], ImageType::getFormatedName('large')).'</image>
+			<image>'.$product_image.'</image>
 		</product>';
 
 	}

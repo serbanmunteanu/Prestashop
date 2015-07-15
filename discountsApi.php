@@ -26,7 +26,7 @@
 include(dirname(__FILE__).'/../../config/config.inc.php');
 include(dirname(__FILE__).'/../../init.php');
 
-$ra_domain_api_key = Configuration::get('retargetingtracker_apikey'); 
+$ra_domain_api_key = Configuration::get('ra_apikey'); 
 
 $key = Tools::getValue('key');
 $type = Tools::getValue('type');

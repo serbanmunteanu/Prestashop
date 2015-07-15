@@ -36,7 +36,7 @@ class RetargetingTracker extends Module
 		$this->author = 'Cosmin Atomei';
 		$this->module_key = '07f632866f76537ce3f8f01eedad4f00';
 		$this->need_instance = 0;
-		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_); 
+		$this->ps_versions_compliancy = array('min' => '1.4', 'max' => _PS_VERSION_); 
 		$this->bootstrap = true;
 
 		parent::__construct();
@@ -46,8 +46,8 @@ class RetargetingTracker extends Module
 
 		$this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-		if (!Configuration::get('retargetingtracker_apikey') ||
-			Configuration::get('retargetingtracker_apikey') == '') 
+		if (!Configuration::get('ra_apikey') ||
+			Configuration::get('ra_apikey') == '') 
 			$this->warning = $this->l('No Domain API Key provided');
 
 		/* Backward compatibility */
@@ -57,28 +57,40 @@ class RetargetingTracker extends Module
 
 	public function install()
 	{
-		if (Shop::isFeatureActive()) Shop::setContext(Shop::CONTEXT_ALL);
-		
-		return parent::install() &&
-			Configuration::updateValue('retargetingtracker_apikey', '') &&
-			Configuration::updateValue('retargetingtracker_discountApikey', '') &&
-			Configuration::updateValue('retargetingtracker_productFeedUrl', '') &&
-			Configuration::updateValue('retargetingtracker_discountApiUrl', '') &&
-			Configuration::updateValue('retargetingtracker_opt_visitHelpPage', '') &&
-			$this->registerHook('displayHome') &&
-			$this->registerHook('displayHeader') &&
-			$this->registerHook('displayOrderConfirmation') &&
-			$this->registerHook('actionAuthentication') &&
-			$this->registerHook('actionCustomerAccountAdd');
+		if (_PS_VERSION_ >= '1.5' && Shop::isFeatureActive()) Shop::setContext(Shop::CONTEXT_ALL);
+
+		if (_PS_VERSION_ >= '1.5') 
+			return parent::install() &&
+				Configuration::updateValue('ra_apikey', '') &&
+				Configuration::updateValue('ra_discountApikey', '') &&
+				Configuration::updateValue('ra_productFeedUrl', '') &&
+				Configuration::updateValue('ra_discountApiUrl', '') &&
+				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+				$this->registerHook('displayHome') &&
+				$this->registerHook('displayHeader') &&
+				$this->registerHook('displayOrderConfirmation') &&
+				$this->registerHook('actionAuthentication') &&
+				$this->registerHook('actionCustomerAccountAdd');
+		else
+			return parent::install() &&
+				Configuration::updateValue('ra_apikey', '') &&
+				Configuration::updateValue('ra_discountApikey', '') &&
+				Configuration::updateValue('ra_productFeedUrl', '') &&
+				Configuration::updateValue('ra_discountApiUrl', '') &&
+				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+				$this->registerHook('header') &&
+				$this->registerHook('orderConfirmation') &&
+				$this->registerHook('authentication') &&
+				$this->registerHook('createAccount');
 	}
 
 	public function uninstall()
 	{
-		return Configuration::deleteByName('retargetingtracker_apikey') &&
-			Configuration::deleteByName('retargetingtracker_discountApikey') &&
-			Configuration::deleteByName('retargetingtracker_productFeedUrl') &&
-			Configuration::deleteByName('retargetingtracker_discountApiUrl') &&
-			Configuration::deleteByName('retargetingtracker_opt_visitHelpPage') &&
+		return Configuration::deleteByName('ra_apikey') &&
+			Configuration::deleteByName('ra_discountApikey') &&
+			Configuration::deleteByName('ra_productFeedUrl') &&
+			Configuration::deleteByName('ra_discountApiUrl') &&
+			Configuration::deleteByName('ra_opt_visitHelpPage') &&
 			parent::uninstall();
 	}
 
@@ -88,11 +100,11 @@ class RetargetingTracker extends Module
 
 		if (Tools::isSubmit('submitBasicSettings'))
 		{
-			$ra_apikey = (string)Tools::getValue('retargetingtracker_apikey');
-			$ra_discountsApikey = (string)Tools::getValue('retargetingtracker_discountApikey');
+			$ra_apikey = (string)Tools::getValue('ra_apikey');
+			$ra_discountsApikey = (string)Tools::getValue('ra_discountApikey');
 			
-			Configuration::updateValue('retargetingtracker_apikey', $ra_apikey);
-			Configuration::updateValue('retargetingtracker_discountApikey', $ra_discountsApikey);
+			Configuration::updateValue('ra_apikey', $ra_apikey);
+			Configuration::updateValue('ra_discountApikey', $ra_discountsApikey);
 			
 			$output .= $this->displayConfirmation($this->l('Settings updated! Enjoy!'));
 		}
@@ -102,15 +114,18 @@ class RetargetingTracker extends Module
 
 			foreach (CMS::listCMS() as $cmsPage)
 			{
-				$option = (string)Tools::getValue('retargetingtracker_opt_visitHelpPage_'.$cmsPage['id_cms']);
+				$option = (string)Tools::getValue('ra_opt_visitHelpPage_'.$cmsPage['id_cms']);
 				if ($option == 'on') $ra_opt_visitHelpPages[] = $cmsPage['id_cms'];
 			}
 			
-			Configuration::updateValue('retargetingtracker_opt_visitHelpPage', implode('|', $ra_opt_visitHelpPages));
+			Configuration::updateValue('ra_opt_visitHelpPage', implode('|', $ra_opt_visitHelpPages));
 
 			$output .= $this->displayConfirmation($this->l('Settings updated! Enjoy!'));
-		}	
-		return $output.$this->displayForm();
+		}
+		if (_PS_VERSION_ < '1.5')
+			return $output.$this->displayFormManually();
+		else
+			return $output.$this->displayForm();
 	}
 
 	public function displayForm()
@@ -129,13 +144,13 @@ class RetargetingTracker extends Module
 				array(
 					'type' => 'text',
 					'label' => $this->l('Domain API Key'),
-					'name' => 'retargetingtracker_apikey',
+					'name' => 'ra_apikey',
 					'desc' => 'You can find your Secure Domain API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Discounts API Key'),
-					'name' => 'retargetingtracker_discountApikey',
+					'name' => 'ra_discountApikey',
 					'desc' => 'You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
 				),
 			),
@@ -153,14 +168,14 @@ class RetargetingTracker extends Module
 				array(
 					'type' => 'text',
 					'label' => $this->l('Product Feed URL'),
-					'name' => 'retargetingtracker_productFeedUrl',
+					'name' => 'ra_productFeedUrl',
 					'desc' => '',
 					'disabled' => 'disabled'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Discounts API URL'),
-					'name' => 'retargetingtracker_discountApiUrl',
+					'name' => 'ra_discountApiUrl',
 					'desc' => '',
 					'disabled' => 'disabled'
 				),
@@ -175,7 +190,7 @@ class RetargetingTracker extends Module
 				array(
 					'type' => 'checkbox',
 					'label' => $this->l('Help Pages'),
-					'name' => 'retargetingtracker_opt_visitHelpPage',
+					'name' => 'ra_opt_visitHelpPage',
 					'desc' => $this->l('Choose the pages on which the "visitHelpPage" event should fire.'),
 					'values' => array(
 						'query' => CMS::listCMS(),
@@ -221,17 +236,105 @@ class RetargetingTracker extends Module
 		);
 
 		// Load current value
-		$helper->fields_value['retargetingtracker_apikey'] = Configuration::get('retargetingtracker_apikey');
-		$helper->fields_value['retargetingtracker_discountApikey'] = Configuration::get('retargetingtracker_discountApikey');
+		$helper->fields_value['ra_apikey'] = Configuration::get('ra_apikey');
+		$helper->fields_value['ra_discountApikey'] = Configuration::get('ra_discountApikey');
 		
-		$helper->fields_value['retargetingtracker_productFeedUrl'] = Configuration::get('retargetingtracker_productFeedUrl') != '' ? Configuration::get('retargetingtracker_productFeedUrl') : '/modules/retargetingtracker/productFeed.php';
-		$helper->fields_value['retargetingtracker_discountApiUrl'] = Configuration::get('retargetingtracker_discountApiUrl') != '' ? Configuration::get('retargetingtracker_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params';
+		$helper->fields_value['ra_productFeedUrl'] = Configuration::get('ra_productFeedUrl') != '' ? Configuration::get('ra_productFeedUrl') : '/modules/retargetingtracker/productFeed.php';
+		$helper->fields_value['ra_discountApiUrl'] = Configuration::get('ra_discountApiUrl') != '' ? Configuration::get('ra_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params';
 		
-		$options_visitHelpPages = explode('|', Configuration::get('retargetingtracker_opt_visitHelpPage'));
+		$options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
 		foreach ($options_visitHelpPages as $option) 
-			$helper->fields_value['retargetingtracker_opt_visitHelpPage_'.$option] = true;
+			$helper->fields_value['ra_opt_visitHelpPage_'.$option] = true;
 
 		return $helper->generateForm($fields_form);
+	}
+
+	public function displayFormManually()
+	{
+		// Form Tags
+		$form = '<form id="configuration_form" class="defaultForm form-horizontal retargetingtracker" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data" novalidate="">';
+		
+		// Basic Settings
+		$form .= '
+		    <input type="hidden" name="submitretargetingtracker" value="1">
+		    <fieldset>
+
+		        <legend> Basic Settings </legend>
+                
+                <label> Domain API Key </label>
+                <div class="margin-form">
+                    <input type="text" name="ra_apikey" id="ra_apikey" value="'.Tools::getValue('ra_apikey', Configuration::get('ra_apikey')).'" class="">
+                    <p class="clear"> You can find your Secure Domain API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account. </p>
+                </div>
+           
+                <label> Discounts API Key </label>
+                <div class="margin-form">
+                    <input type="text" name="ra_discountApikey" id="ra_discountApikey" value="'.Tools::getValue('ra_discountApikey', Configuration::get('ra_discountApikey')).'" class="">
+                    <p class="clear"> You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account. </p>
+                </div>
+		        
+		        <center>
+		            <button type="submit" value="1" id="configuration_form_submit_btn" name="submitBasicSettings" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
+		        </center>
+
+		    </fieldset>';
+
+		// Specific URLs
+    	$form .= '
+		    <fieldset>
+
+		        <legend> Specific URLs </legend>
+
+                <label> Product Feed URL </label>
+                <div class="margin-form">
+                    <input type="text" name="ra_productFeedUrl" id="ra_productFeedUrl" value="'.(Configuration::get('ra_productFeedUrl') != '' ? Configuration::get('ra_productFeedUrl') : '/modules/retargetingtracker/productFeed.php').'" class="" disabled="disabled">
+            	</div>
+
+                <label> Discounts API URL </label>
+                <div class="margin-form">
+                    <input type="text" name="ra_discountApiUrl" id="ra_discountApiUrl" value="'.(Configuration::get('ra_discountApiUrl') != '' ? Configuration::get('ra_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params').'" class="" disabled="disabled">
+            	</div>
+
+		    </fieldset>
+		    ';
+
+		// Tracker Options
+	    $form .= '
+		    <fieldset>
+
+		        <legend> Tracker Options </legend>
+		        
+				<label> Help Pages </label>
+				<div class="margin-form">';
+
+		$options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
+		$helpPagesChecked = array();
+		foreach ($options_visitHelpPages as $option) 
+			$helpPagesChecked['ra_opt_visitHelpPage_'.$option] = true;
+
+		foreach (CMS::listCMS() as $key => $page) {
+			$form .= '
+			<div>
+					<input type="checkbox" name="ra_opt_visitHelpPage_'.$page['id_cms'].'" id="ra_opt_visitHelpPage_'.$page['id_cms'].'" class="" '.(!empty($helpPagesChecked['ra_opt_visitHelpPage_'.$page['id_cms']]) ? 'checked="checked"' : 'notchecked').'>
+					<label class="t" for="ra_opt_visitHelpPage_'.$page['id_cms'].'">'.$page['meta_title'].'</label>
+			</div>
+			';
+		}
+
+		$form .= '
+					<p class="clear"> Choose the pages on which the "visitHelpPage" event should fire. </p>
+				</div>
+
+		        <center>
+		            <button type="submit" value="1" id="configuration_form_submit_btn_2" name="submitTrackerOptions" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
+		        </center>
+
+		    </fieldset>';
+
+		// Form Tags
+		$form .= '</form>';
+
+		return $form;
 	}
 
 	/**
@@ -240,7 +343,10 @@ class RetargetingTracker extends Module
 	*/
 	public function hookHeader()
 	{
-		$this->controller = Dispatcher::getInstance()->getController();
+		$this->controller = $this->getCurrentController();
+
+		if (empty($this->controller))
+			return '/*<script>console.info("Retargeting Info: Can\'t get current Controller details..");</script>*/';
 
 		// embedd RA.js
 		$js_code = $this->_assignEmbedding();
@@ -349,9 +455,25 @@ class RetargetingTracker extends Module
 	}
 
 	/**
+	* setEmail - hook for customer authentification (except registration)
+	*/
+	public function hookAuthentication()
+	{
+		$this->prepSetEmailJS();
+	}
+
+	/**
 	* setEmail - hook for customer registration
 	*/
 	public function hookActionCustomerAccountAdd()
+	{
+		$this->prepSetEmailJS();
+	}
+
+	/**
+	* setEmail - hook for customer registration
+	*/
+	public function hookCreateAccount()
 	{
 		$this->prepSetEmailJS();
 	}
@@ -363,10 +485,7 @@ class RetargetingTracker extends Module
 		$js_code = 'var _ra = _ra || {};
 			_ra.setEmailInfo = {
 				"email": "'.$customer->email.'",
-				"name": "'.$customer->firstname.' '.$customer->lastname.'",
-				"phone": "",
-				"city": "",
-				"sex": "'.$customer->id_gender.'"
+				"name": "'.$customer->firstname.' '.$customer->lastname.'"
 			};
 			
 			if (_ra.ready !== undefined) {
@@ -382,6 +501,8 @@ class RetargetingTracker extends Module
 	*/
 	public function hookOrderConfirmation($params)
 	{
+		$js_code = '';
+
 		$order = $params['objOrder'];
 		$discounts = $order->getDiscounts();
 		$customer = new Customer((int)$order->id_customer);
@@ -394,8 +515,12 @@ class RetargetingTracker extends Module
 			
 			foreach ($cart_instance->getProducts() as $orderProduct)
 			{
+				$js_code .= print_r($orderProduct, true);
+
+				$orderProductAttributes = (!empty($orderProduct['attributes_small']) ? str_replace(', ', '-', $orderProduct['attributes_small']) : '');
+
 				$orderProduct_instance = new Product((int)$orderProduct['id_product']);
-				$orderProducts[] = '{"id": "'.$orderProduct['id_product'].'", "quantity": '.$orderProduct['quantity'].', "price": '.$orderProduct_instance->getPrice(true, null, 2).', "variation_code": "'.$orderProduct['attributes_small'].'"}';
+				$orderProducts[] = '{"id": "'.$orderProduct['id_product'].'", "quantity": '.$orderProduct['quantity'].', "price": '.$orderProduct_instance->getPrice(true, null, 2).', "variation_code": "'.$orderProductAttributes.'"}';
 			}
 
 			$orderProducts = '['.implode(', ', $orderProducts).']';
@@ -412,7 +537,7 @@ class RetargetingTracker extends Module
 				$discountsCode = implode(', ', $discountsCode);
 			}
 			
-			$js_code = 'var _ra = _ra || {};	
+			$js_code .= 'var _ra = _ra || {};	
 				_ra.saveOrderInfo = {
 					"order_no": '.$order->id.',
 					"lastname": "'.$address->lastname.'",
@@ -448,7 +573,7 @@ class RetargetingTracker extends Module
 		$js_embedd = false;
 
 		
-		$ra_domain_api_key = Configuration::get('retargetingtracker_apikey'); 
+		$ra_domain_api_key = Configuration::get('ra_apikey'); 
 		
 		if ($ra_domain_api_key && $ra_domain_api_key != '')
 		{
@@ -461,8 +586,7 @@ class RetargetingTracker extends Module
 			';
 		} 
 		else 
-		{
-			
+		{	
 			$js_embedd = '(function(){
 				var ra = document.createElement("script"); ra.type ="text/javascript"; ra.async = true; ra.src = ("https:" ==
 				document.location.protocol ? "https://" : "http://") + "retargeting-data.eu/" +
@@ -476,28 +600,45 @@ class RetargetingTracker extends Module
 
 	protected function _assignSendCategory()
 	{
-		$category_instance = $this->context->controller->getCategory();
-		
+		if (method_exists($this->context->controller, 'getCategory'))
+			$category_instance = $this->context->controller->getCategory();
+		else
+			$category_instance = new Category((int)Tools::getValue('id_category'), $this->context->language->id);
+
 		$js_category = array();
 		$arr_categoryBreadcrumb = array();
 
 		if (Validate::isLoadedObject($category_instance))
 		{
-			$categoryTree = $category_instance->getParentsCategories();
-			foreach ($categoryTree as $key => $categoryNode)
+			if (_PS_VERSION_ >= '1.5')
 			{
-				if ($categoryNode['is_root_category']) continue;
-				else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false';
-				else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'"';
-				else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
-				else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+				$categoryTree = $category_instance->getParentsCategories();
+				foreach ($categoryTree as $key => $categoryNode)
+				{
+					if ($categoryNode['is_root_category']) continue;
+					else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = '"id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false';
+					else if ($key == 0) $js_category = '"id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'"';
+					else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+					else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+				}
+			}
+			else
+			{
+				$categoryTree = $category_instance->getParentsCategories();
+				foreach ($categoryTree as $key => $categoryNode)
+				{
+					if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]) )) $js_category = '"id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false';
+					else if ($key == 0) $js_category = '"id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'"';
+					else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+					else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+				}
 			}
 		}
 
 		$js_categoryBreadcrumb = '['.implode(', ', $arr_categoryBreadcrumb).']';
 
 		$js_code = 'var _ra = _ra || {};
-			_ra.sendCategoryInfo = '.$js_category.',
+			_ra.sendCategoryInfo = { '.$js_category.',
 				"category_breadcrumb": '.$js_categoryBreadcrumb.'
 			};
 			
@@ -513,9 +654,12 @@ class RetargetingTracker extends Module
 	{
 		$js_code = '';
 
-		$brand_instance = $this->context->controller->getManufacturer();
-		
-		if ($brand_instance != '')
+		if (method_exists($this->context->controller, 'getManufacturer'))
+			$brand_instance = $this->context->controller->getManufacturer();
+		else
+			$brand_instance = new Manufacturer((int)Tools::getValue('id_manufacturer'), $this->context->language->id);
+
+		if (Validate::isLoadedObject($brand_instance))
 		{
 			$js_code .= 'var _ra = _ra || {};
 				_ra.sendBrandInfo = {
@@ -535,46 +679,97 @@ class RetargetingTracker extends Module
 	protected function _assignSendProduct()
 	{
 		$link_instance = new LinkCore();
-		$product_instance = $this->context->controller->getProduct();
-		$product_fields = $product_instance->getFields();
-		$category_instance = new Category($product_instance->id_category_default);   
 
-		$js_category = 'false';
-		$arr_categoryBreadcrumb = array();
+		if (method_exists($this->context->controller, 'getProduct'))
+			$product_instance = $this->context->controller->getProduct();
+		else
+			$product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
 
-		if (Validate::isLoadedObject($category_instance))
+		if (Validate::isLoadedObject($product_instance))
 		{
-			$categoryTree = $category_instance->getParentsCategories();
-			foreach ($categoryTree as $key => $categoryNode)
+			$product_fields = $product_instance->getFields();
+			$category_instance = new Category($product_instance->id_category_default, $this->context->language->id);   
+
+			$js_category = 'false';
+			$arr_categoryBreadcrumb = array();
+
+			if (Validate::isLoadedObject($category_instance))
 			{
-				if ($categoryNode['is_root_category']) continue;
-				else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
-				else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
-				else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
-				else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+				if (_PS_VERSION_ >= '1.5')
+				{
+					$categoryTree = $category_instance->getParentsCategories();
+					foreach ($categoryTree as $key => $categoryNode)
+					{
+						if ($categoryNode['is_root_category']) continue;
+						else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+						else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+						else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+						else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+					}
+				}
+				else
+				{
+					$categoryTree = $category_instance->getParentsCategories();
+					foreach ($categoryTree as $key => $categoryNode)
+					{
+						if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+						else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+						else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
+						else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+					}
+				}
 			}
+
+			$js_categoryBreadcrumb = '['.implode(', ', $arr_categoryBreadcrumb).']';
+
+			$product_image = '';
+			$id_image = Product::getCover($product_fields['id_product']);
+			if (sizeof($id_image) > 0) {
+				$image = new Image($id_image['id_image']);
+				if (_PS_VERSION_ >= '1.5')
+					$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath()."-".ImageType::getFormatedName('large').".jpg";
+				else
+					$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->id_product."-".$image->id_image."-large.jpg";
+			} else {
+				$product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
+			}
+
+			if (_PS_VERSION_ >= '1.5')
+			{
+				$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
+				$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
+
+				$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
+			}
+			else
+			{
+				$product_price = $product_instance->getPrice(true, null, 2, null, false, false);
+				$product_promo = ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2) ? $product_instance->getPrice(true, null, 2) : 0);
+
+				$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
+			}
+
+
+
+			$js_code = 'var _ra = _ra || {};
+				_ra.sendProductInfo = {
+					"id": "'.$product_fields['id_product'].'",
+					"name": "'.(is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name).'",
+					"url": "'.$product_instance->getLink().'", 
+				  	"img": "'.$product_image.'", 
+				  	"price": '.$product_price.',
+					"promo": '.$product_promo.',
+					"stock": '.$product_stock.',
+					"brand": '.($product_instance->manufacturer_name != '' ? '"'.$product_instance->manufacturer_name.'"' : 'false').',
+					"category": '.$js_category.',
+					"category_breadcrumb": '.$js_categoryBreadcrumb.'
+				};
+				
+				if (_ra.ready !== undefined) {
+					_ra.sendProduct(_ra.sendProductInfo);
+				}
+			';
 		}
-
-		$js_categoryBreadcrumb = '['.implode(', ', $arr_categoryBreadcrumb).']';
-
-		$js_code = 'var _ra = _ra || {};
-			_ra.sendProductInfo = {
-				"id": "'.$product_fields['id_product'].'",
-				"name": "'.$product_instance->name.'",
-				"url": "'.$product_instance->getLink().'", 
-			  	"img": "'.$link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large')).'", 
-			  	"price": '.$product_instance->getPriceWithoutReduct(true, null, 2).',
-				"promo": '.($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0).',
-				"stock": '.($product_instance->available_now == 'In stock' ? 1 : 0).',
-				"brand": '.($product_instance->manufacturer_name != '' ? '"'.$product_instance->manufacturer_name.'"' : 'false').',
-				"category": '.$js_category.',
-				"category_breadcrumb": '.$js_categoryBreadcrumb.'
-			};
-			
-			if (_ra.ready !== undefined) {
-				_ra.sendProduct(_ra.sendProductInfo);
-			}
-		';
 
 		return $js_code;
 	}
@@ -624,9 +819,9 @@ class RetargetingTracker extends Module
 				}
 			}
 			
-			$(document).on("click", ".color_pick", _ra_setVariation);
-			$(document).on("change", ".attribute_select", _ra_setVariation);
-			$(document).on("click", ".attribute_radio", _ra_setVariation);
+			$(".color_pick").click(_ra_setVariation);
+			$("#attributes select").change(_ra_setVariation);
+			$("#attributes radio").click(_ra_setVariation);
 		';
 
 		return $js_code;
@@ -634,10 +829,12 @@ class RetargetingTracker extends Module
 
 	protected function _assignAddToWishlist()
 	{
-		$js_code = 'var _ra_WishlistCart = WishlistCart;
-			WishlistCart = function(id, action, id_product, id_product_attribute, quantity, id_wishlist) {
-				_ra.addToWishlist(id_product);
-				return _ra_WishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
+		$js_code = 'if (typeof WishlistCart !== "undefined") {
+				var _ra_WishlistCart = WishlistCart;
+				WishlistCart = function(id, action, id_product, id_product_attribute, quantity, id_wishlist) {
+					_ra.addToWishlist(id_product);
+					return _ra_WishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
+				}
 			}
 		';
 
@@ -650,7 +847,7 @@ class RetargetingTracker extends Module
 				_ra.clickImage($("#product_page_product_id").val());
 			}
 
-			$(document).on("click", "#image-block", _ra_clickImage);
+			$("#image-block").click(_ra_clickImage);
 		';
 
 		return $js_code;
@@ -662,7 +859,7 @@ class RetargetingTracker extends Module
 				_ra.commentOnProduct($("#product_page_product_id").val());
 			}
 
-			$(document).on("click", "#submitNewMessage", _ra_commentOnProduct);
+			$("#submitNewMessage").click(_ra_commentOnProduct);
 		';
 
 		return $js_code;
@@ -670,35 +867,60 @@ class RetargetingTracker extends Module
 
 	protected function _assignMouseOverPrice()
 	{
-		$product_instance = $this->context->controller->getProduct();
-		$product_fields = $product_instance->getFields();
-		
-		$js_code = 'function _ra_mouseOverPrice() {
-				if (typeof _ra.mouseOverPrice !== "function") return false;
-				_ra.mouseOverPrice("'.$product_fields['id_product'].'", {
-					"price": '.$product_instance->getPriceWithoutReduct(true, null, 2).',
-					"promo": '.($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0).'
-				});
+		if (method_exists($this->context->controller, 'getProduct'))
+			$product_instance = $this->context->controller->getProduct();
+		else
+			$product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
+
+		if (Validate::isLoadedObject($product_instance))
+		{
+			$product_fields = $product_instance->getFields();
+			
+			if (_PS_VERSION_ >= '1.5')
+			{
+				$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
+				$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
+			}
+			else
+			{
+				$product_price = $product_instance->getPrice(true, null, 2, null, false, false);
+				$product_promo = ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2) ? $product_instance->getPrice(true, null, 2) : 0);
 			}
 
-			$(document).on("mouseenter", "#our_price_display", _ra_mouseOverPrice);
-		';
+			$js_code = 'function _ra_mouseOverPrice() {
+					if (typeof _ra.mouseOverPrice !== "function") return false;
+					_ra.mouseOverPrice("'.$product_fields['id_product'].'", {
+						"price": '.$product_price.',
+						"promo": '.$product_promo.'
+					});
+				}
+
+				$("#our_price_display").mouseenter(_ra_mouseOverPrice);
+			';
+		}
 
 		return $js_code;
 	}
 
 	protected function _assignMouseOverAddToCart()
 	{
-		$product_instance = $this->context->controller->getProduct();
-		$product_fields = $product_instance->getFields();
+		if (method_exists($this->context->controller, 'getProduct'))
+			$product_instance = $this->context->controller->getProduct();
+		else
+			$product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
 
-		$js_code = 'function _ra_mouseOverAddToCart() {
-				if (typeof _ra.mouseOverAddToCart !== "function") return false;
-				_ra.mouseOverAddToCart("'.$product_fields['id_product'].'");
-			}
+		if (Validate::isLoadedObject($product_instance))
+		{
+			$product_fields = $product_instance->getFields();
 
-			$(document).on("mouseenter", "#add_to_cart button", _ra_mouseOverAddToCart);
-		';
+			$js_code = 'function _ra_mouseOverAddToCart() {
+					if (typeof _ra.mouseOverAddToCart !== "function") return false;
+					_ra.mouseOverAddToCart("'.$product_fields['id_product'].'");
+				}
+
+				$("#add_to_cart [type=\'submit\']").mouseenter(_ra_mouseOverAddToCart);
+			';
+		}
 
 		return $js_code;
 	}
@@ -717,7 +939,7 @@ class RetargetingTracker extends Module
 
 	protected function _assignVisitHelpPage()
 	{
-		$str_visitHelpPage = Configuration::get('retargetingtracker_opt_visitHelpPage');
+		$str_visitHelpPage = Configuration::get('ra_opt_visitHelpPage');
 		$arr_visitHelpPage = explode('|', $str_visitHelpPage);
 		
 		$currentCMSPageId = $this->context->controller->cms->id;
@@ -771,5 +993,16 @@ class RetargetingTracker extends Module
 		<script type="text/javascript" id="ra">
 			'.$js_code.'
 		</script>';
+	}
+
+	protected function getCurrentController()
+	{
+		// For Prestashop v1.5 and ..
+		if (_PS_VERSION_ >= '1.5')
+			return Dispatcher::getInstance()->getController();
+		
+		// For Prestashop v1.4
+		$script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+		return str_replace('.php', '', basename($script_name));
 	}
 }
