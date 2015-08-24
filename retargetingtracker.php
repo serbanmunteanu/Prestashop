@@ -515,8 +515,6 @@ class RetargetingTracker extends Module
 			
 			foreach ($cart_instance->getProducts() as $orderProduct)
 			{
-				$js_code .= print_r($orderProduct, true);
-
 				$orderProductAttributes = (!empty($orderProduct['attributes_small']) ? str_replace(', ', '-', $orderProduct['attributes_small']) : '');
 
 				$orderProduct_instance = new Product((int)$orderProduct['id_product']);
