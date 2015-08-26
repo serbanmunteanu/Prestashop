@@ -32,7 +32,7 @@ class RetargetingTracker extends Module
 	{
 		$this->name = 'retargetingtracker';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.0.1';
+		$this->version = '1.0.2';
 		$this->author = 'Cosmin Atomei';
 		$this->module_key = '07f632866f76537ce3f8f01eedad4f00';
 		$this->need_instance = 0;
@@ -66,6 +66,7 @@ class RetargetingTracker extends Module
 				Configuration::updateValue('ra_productFeedUrl', '') &&
 				Configuration::updateValue('ra_discountApiUrl', '') &&
 				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+				Configuration::updateValue('ra_mediaServerProtocol', 'http://') &&
 				$this->registerHook('displayHome') &&
 				$this->registerHook('displayHeader') &&
 				$this->registerHook('displayOrderConfirmation') &&
@@ -91,6 +92,7 @@ class RetargetingTracker extends Module
 			Configuration::deleteByName('ra_productFeedUrl') &&
 			Configuration::deleteByName('ra_discountApiUrl') &&
 			Configuration::deleteByName('ra_opt_visitHelpPage') &&
+			Configuration::deleteByName('ra_mediaServerProtocol') &&
 			parent::uninstall();
 	}
 
@@ -102,9 +104,12 @@ class RetargetingTracker extends Module
 		{
 			$ra_apikey = (string)Tools::getValue('ra_apikey');
 			$ra_discountsApikey = (string)Tools::getValue('ra_discountApikey');
-			
+			$ra_mediaServerProtocol = (string)Tools::getValue('ra_mediaServerProtocol');
+
 			Configuration::updateValue('ra_apikey', $ra_apikey);
 			Configuration::updateValue('ra_discountApikey', $ra_discountsApikey);
+			Configuration::updateValue('ra_mediaServerProtocol',$ra_mediaServerProtocol);
+
 			
 			$output .= $this->displayConfirmation($this->l('Settings updated! Enjoy!'));
 		}
@@ -152,6 +157,12 @@ class RetargetingTracker extends Module
 					'label' => $this->l('Discounts API Key'),
 					'name' => 'ra_discountApikey',
 					'desc' => 'You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
+				),
+				array(
+					'type' => 'text',
+					'label' => $this->l('Media Server'),
+					'name' => 'ra_mediaServerProtocol',
+					'desc' => $this->l('If you\'re using media server, you\'ll have to set the http protocol for it so Retargeting can get the real image paths')
 				),
 			),
 			'submit' => array(
@@ -245,6 +256,8 @@ class RetargetingTracker extends Module
 		$options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
 		foreach ($options_visitHelpPages as $option) 
 			$helper->fields_value['ra_opt_visitHelpPage_'.$option] = true;
+
+		$helper->fields_value['ra_mediaServerProtocol'] = Configuration::get('ra_mediaServerProtocol');
 
 		return $helper->generateForm($fields_form);
 	}
@@ -720,12 +733,22 @@ class RetargetingTracker extends Module
 
 			$js_categoryBreadcrumb = '['.implode(', ', $arr_categoryBreadcrumb).']';
 
+
+			$imgDomain = _PS_BASE_URL_;
+			if(_MEDIA_SERVER_1_ != null){
+				$imgDomain = Configuration::get('ra_mediaServerProtocol') . _MEDIA_SERVER_1_;
+			} elseif (_MEDIA_SERVER_2_ != null) {
+				$imgDomain = Configuration::get('ra_mediaServerProtocol') . _MEDIA_SERVER_2_;
+			} elseif (_MEDIA_SERVER_3_ != null) {
+				$imgDomain = Configuration::get('ra_mediaServerProtocol') . _MEDIA_SERVER_3_;
+			}
+
 			$product_image = '';
 			$id_image = Product::getCover($product_fields['id_product']);
 			if (sizeof($id_image) > 0) {
 				$image = new Image($id_image['id_image']);
 				if (_PS_VERSION_ >= '1.5')
-					$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->getExistingImgPath()."-".ImageType::getFormatedName('large').".jpg";
+					$product_image = $imgDomain._THEME_PROD_DIR_.$image->getExistingImgPath()."-".ImageType::getFormatedName('large').".jpg";
 				else
 					$product_image = _PS_BASE_URL_._THEME_PROD_DIR_.$image->id_product."-".$image->id_image."-large.jpg";
 			} else {
@@ -734,20 +757,25 @@ class RetargetingTracker extends Module
 
 			if (_PS_VERSION_ >= '1.5')
 			{
-				$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
-				$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
 
+			$vat = $product_instance->tax_rate;
+			$vat_value = ((100 + $vat)/100);
+
+			if($vat > 0){
+				$product_price = round(($product_instance->base_price * $vat_value),2);
+			}else{
+				$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
+			}
+
+				$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
 				$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
 			}
 			else
 			{
 				$product_price = $product_instance->getPrice(true, null, 2, null, false, false);
 				$product_promo = ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2) ? $product_instance->getPrice(true, null, 2) : 0);
-
 				$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
 			}
-
-
 
 			$js_code = 'var _ra = _ra || {};
 				_ra.sendProductInfo = {
@@ -876,7 +904,14 @@ class RetargetingTracker extends Module
 			
 			if (_PS_VERSION_ >= '1.5')
 			{
+			$vat = $product_instance->tax_rate;
+			$vat_value = ((100 + $vat)/100); // default value
+
+			if($vat > 0){
+				$product_price = round(($product_instance->base_price * $vat_value),2);
+			}else{
 				$product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
+			}
 				$product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
 			}
 			else
