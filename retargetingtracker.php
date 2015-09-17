@@ -67,6 +67,7 @@ class RetargetingTracker extends Module
 				Configuration::updateValue('ra_discountApiUrl', '') &&
 				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
 				Configuration::updateValue('ra_mediaServerProtocol', 'http://') &&
+				Configuration::updateValue('ra_init', 'false') &&
 				$this->registerHook('displayHome') &&
 				$this->registerHook('displayHeader') &&
 				$this->registerHook('displayOrderConfirmation') &&
@@ -79,6 +80,7 @@ class RetargetingTracker extends Module
 				Configuration::updateValue('ra_productFeedUrl', '') &&
 				Configuration::updateValue('ra_discountApiUrl', '') &&
 				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+				Configuration::updateValue('ra_init', 'false') &&
 				$this->registerHook('header') &&
 				$this->registerHook('orderConfirmation') &&
 				$this->registerHook('authentication') &&
@@ -93,6 +95,7 @@ class RetargetingTracker extends Module
 			Configuration::deleteByName('ra_discountApiUrl') &&
 			Configuration::deleteByName('ra_opt_visitHelpPage') &&
 			Configuration::deleteByName('ra_mediaServerProtocol') &&
+			Configuration::deleteByName('ra_init') &&
 			parent::uninstall();
 	}
 
@@ -100,7 +103,14 @@ class RetargetingTracker extends Module
 	{
 		$output = null;
 
-		if (Tools::isSubmit('submitBasicSettings'))
+		if (Tools::isSubmit('submitDisableInit'))
+		{
+			if ((int)Tools::getValue('ra_init'))
+			{
+				Configuration::updateValue('ra_init', 'true');
+			}
+		}
+		else if (Tools::isSubmit('submitBasicSettings'))
 		{
 			$ra_apikey = (string)Tools::getValue('ra_apikey');
 			$ra_discountsApikey = (string)Tools::getValue('ra_discountApikey');
@@ -127,10 +137,123 @@ class RetargetingTracker extends Module
 
 			$output .= $this->displayConfirmation($this->l('Settings updated! Enjoy!'));
 		}
-		if (_PS_VERSION_ < '1.5')
-			return $output.$this->displayFormManually();
-		else
-			return $output.$this->displayForm();
+
+		if ( Configuration::get('ra_init') == 'false')
+		{
+			return $this->displayInitForm();
+		} 
+		else 
+		{
+			if (_PS_VERSION_ < '1.5')
+				return $this->displayFormManually();
+			else
+				return $this->displayForm();
+		}
+	}
+
+	public function displayInitForm()
+	{
+		// Form Tags
+		$form = '<form id="configuration_form" class="initForm defaultForm form-horizontal retargetingtracker" action="'.$_SERVER['REQUEST_URI'].'" method="post" enctype="multipart/form-data" novalidate="">';
+		
+		// Basic Settings
+		$form .= '
+			<section class="init">
+
+				<input type="hidden" name="ra_init" value="1">
+
+				<article>
+					<!--<img src="imgs/logo-big.jpg">-->
+					<h1>Hello!</h1>
+					<h2>To have access to our awesome features you need a <a href="https://retargeting.biz" target="_blank">Retargeting account</a>.</h2>
+					<div class="ra_row">
+						<button type="submit" value="1" id="configuration_form_submit_btn" name="submitDisableInit" class="btn-init btn-disableInit">I already have an account</button>
+						<a href="https://retargeting.biz/signup" target="_blank"><div class="btn-init btn-cta">Start your 14-day Free Trial</div></a>
+					</div>
+				</article>
+			
+			</section>
+
+<link href="//fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic" rel="stylesheet" type="text/css">
+
+<style>
+section.init {
+	position: relative;
+	width: 100%;
+    height: 400px;
+	top: 0;
+	left: 0;
+}
+section.init a, section.init a:hover {
+	color: #48494F;
+	font-weight: bold;
+	text-decoration: none;
+}
+section.init article {
+	position: absolute;
+	max-width: 500px;
+	height: 329px;
+	padding: 0;
+	background-color: white;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+section.init img {
+	margin: 0 auto;
+	display: block;
+}
+section.init h1 {
+	font-family: "Lato", sans-serif;
+	font-size: 50px;
+	font-weight: 900;
+	margin: 80px 0 0 0;
+	color: #48494F;
+	text-align: center;
+}
+section.init h2 {
+	font-family: "Lato", sans-serif;
+	font-size: 20px;
+	font-weight: 300;
+	color: #48494F;
+	text-align: center;
+    line-height: 1.5em;
+}
+section.init .ra_row {
+	position: relative;
+	display: block;
+	width: 100%;
+	margin-top: 70px;
+	overflow: auto;
+}
+section.init .btn-init {
+	position: relative;
+	display: block;
+	width: 50%;
+	padding: 15px 0px;
+	border: none;
+	color: #48494F;
+	font-weight: bold;
+	background-color: whitesmoke;
+	float: left;
+	cursor: pointer;
+	margin: 0px;
+	text-align: center;
+}
+section.init .btn-init.btn-cta {
+	background-color: #F11A22;
+	border-color: #F11A22;
+	color: white;
+}
+</style>
+		';
+
+		// Form Tags
+		$form .= '</form>';
+
+		return $form;
 	}
 
 	public function displayForm()
