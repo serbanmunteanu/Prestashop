@@ -525,7 +525,7 @@ section.init .btn-init.btn-cta {
 		}
 
 		// checkoutIds
-		if ($this->controller == 'order')
+		if ($this->controller == 'order' || $this->controller == 'orderopc')
 		{
 			$js_checkoutIds = $this->_assignCheckoutIds();
 			$js_code .= $js_checkoutIds;
