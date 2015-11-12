@@ -943,6 +943,25 @@ section.init .btn-init.btn-cta {
 	
 				return _ra_ajaxCart_add(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist);
 			}
+			
+			// #buy_block compatability
+			if ($("#buy_block").length) {
+				$("#buy_block").submit(function() {
+					var $pid = $("#buy_block input[name=\'id_product\']");
+					if (typeof _ra.addToCart === "function" && $pid.length) {
+						_ra.addToCart($pid.val(), false);
+					}
+				});	
+			}
+			if ($(".ajax_add_to_cart_button").length) {
+				$(".ajax_add_to_cart_button").click(function() {
+					var pid = $(this).data("id-product");
+					if (typeof _ra.addToCart === "function" && pid) {
+						_ra.addToCart(pid, false);
+					}
+				});
+			}
+			
 		';
 
 		return $js_code;
