@@ -926,22 +926,24 @@ section.init .btn-init.btn-cta {
 	protected function _assignAddToCart($controller) 
 	{	
 		$js_code = '
-			var _ra_ajaxCart_add = ajaxCart.add;
-			ajaxCart.add = function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist) {
-
-				$.ajax({
-					url: baseDir + "modules/retargetingtracker/ajax.php",
-					type: "GET",
-					data: "ajax=true&method=getAddToCartJS&type='.$controller.'&pid=" + idProduct + "&vid=" + idCombination,
-					success: function(data) {
-						var s = document.createElement("script");
-						s.type = "text/javascript";
-						s.text = data;
-						$("head").append(s);
-					}
-				});
+			if (typeof ajaxCart !== "undefined") {
+				var _ra_ajaxCart_add = ajaxCart.add;
+				ajaxCart.add = function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist) {
 	
-				return _ra_ajaxCart_add(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist);
+					$.ajax({
+						url: baseDir + "modules/retargetingtracker/ajax.php",
+						type: "GET",
+						data: "ajax=true&method=getAddToCartJS&type='.$controller.'&pid=" + idProduct + "&vid=" + idCombination,
+						success: function(data) {
+							var s = document.createElement("script");
+							s.type = "text/javascript";
+							s.text = data;
+							$("head").append(s);
+						}
+					});
+		
+					return _ra_ajaxCart_add(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist);
+				}
 			}
 			
 			// #buy_block compatability
