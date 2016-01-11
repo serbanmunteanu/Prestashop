@@ -735,7 +735,7 @@ section.init .btn-init.btn-cta {
 		
 		if ($ra_domain_api_key && $ra_domain_api_key != '' && $ra_token && $ra_token != '')
 		{
-			$client = new Retargeting_REST_API_Client("API_KEY", "TOKEN");
+			$client = new Retargeting_REST_API_Client($ra_domain_api_key, $ra_token);
 			$client->setResponseFormat("json");
 			$client->setDecoding(false);
 
