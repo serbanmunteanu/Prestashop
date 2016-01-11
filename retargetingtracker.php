@@ -26,6 +26,8 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
+include(dirname(__FILE__). '/lib/retargeting-rest-api/Client.php');
+
 class RetargetingTracker extends Module
 {
 	public function __construct()
@@ -62,7 +64,7 @@ class RetargetingTracker extends Module
 		if (_PS_VERSION_ >= '1.5') 
 			return parent::install() &&
 				Configuration::updateValue('ra_apikey', '') &&
-				Configuration::updateValue('ra_discountApikey', '') &&
+				Configuration::updateValue('ra_token', '') &&
 				Configuration::updateValue('ra_productFeedUrl', '') &&
 				Configuration::updateValue('ra_discountApiUrl', '') &&
 				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
@@ -76,7 +78,7 @@ class RetargetingTracker extends Module
 		else
 			return parent::install() &&
 				Configuration::updateValue('ra_apikey', '') &&
-				Configuration::updateValue('ra_discountApikey', '') &&
+				Configuration::updateValue('ra_token', '') &&
 				Configuration::updateValue('ra_productFeedUrl', '') &&
 				Configuration::updateValue('ra_discountApiUrl', '') &&
 				Configuration::updateValue('ra_opt_visitHelpPage', '') &&
@@ -90,7 +92,7 @@ class RetargetingTracker extends Module
 	public function uninstall()
 	{
 		return Configuration::deleteByName('ra_apikey') &&
-			Configuration::deleteByName('ra_discountApikey') &&
+			Configuration::deleteByName('ra_token') &&
 			Configuration::deleteByName('ra_productFeedUrl') &&
 			Configuration::deleteByName('ra_discountApiUrl') &&
 			Configuration::deleteByName('ra_opt_visitHelpPage') &&
@@ -113,11 +115,11 @@ class RetargetingTracker extends Module
 		else if (Tools::isSubmit('submitBasicSettings'))
 		{
 			$ra_apikey = (string)Tools::getValue('ra_apikey');
-			$ra_discountsApikey = (string)Tools::getValue('ra_discountApikey');
+			$ra_token = (string)Tools::getValue('ra_token');
 			$ra_mediaServerProtocol = (string)Tools::getValue('ra_mediaServerProtocol');
 
 			Configuration::updateValue('ra_apikey', $ra_apikey);
-			Configuration::updateValue('ra_discountApikey', $ra_discountsApikey);
+			Configuration::updateValue('ra_token', $ra_token);
 			Configuration::updateValue('ra_mediaServerProtocol',$ra_mediaServerProtocol);
 
 			
@@ -277,9 +279,9 @@ section.init .btn-init.btn-cta {
 				),
 				array(
 					'type' => 'text',
-					'label' => $this->l('Discounts API Key'),
-					'name' => 'ra_discountApikey',
-					'desc' => 'You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
+					'label' => $this->l('Token'),
+					'name' => 'ra_token',
+					'desc' => 'You can find your Secure Token in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
 				),
 				array(
 					'type' => 'text',
@@ -371,7 +373,7 @@ section.init .btn-init.btn-cta {
 
 		// Load current value
 		$helper->fields_value['ra_apikey'] = Configuration::get('ra_apikey');
-		$helper->fields_value['ra_discountApikey'] = Configuration::get('ra_discountApikey');
+		$helper->fields_value['ra_token'] = Configuration::get('ra_token');
 		
 		$helper->fields_value['ra_productFeedUrl'] = Configuration::get('ra_productFeedUrl') != '' ? Configuration::get('ra_productFeedUrl') : '/modules/retargetingtracker/productFeed.php';
 		$helper->fields_value['ra_discountApiUrl'] = Configuration::get('ra_discountApiUrl') != '' ? Configuration::get('ra_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params';
@@ -405,7 +407,7 @@ section.init .btn-init.btn-cta {
            
                 <label> Discounts API Key </label>
                 <div class="margin-form">
-                    <input type="text" name="ra_discountApikey" id="ra_discountApikey" value="'.Tools::getValue('ra_discountApikey', Configuration::get('ra_discountApikey')).'" class="">
+                    <input type="text" name="ra_token" id="ra_token" value="'.Tools::getValue('ra_token', Configuration::get('ra_token')).'" class="">
                     <p class="clear"> You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account. </p>
                 </div>
 		        
@@ -646,6 +648,11 @@ section.init .btn-init.btn-cta {
 
 		if (Validate::isLoadedObject($order) && Validate::isLoadedObject($customer))
 		{
+			$paramsAPI = array(
+				'orderInfo' => null,
+				'orderProducts' => array()
+				);
+
 			$orderProducts = array();
 			$cart_instance = new Cart($order->id_cart);
 			
@@ -655,6 +662,13 @@ section.init .btn-init.btn-cta {
 
 				$orderProduct_instance = new Product((int)$orderProduct['id_product']);
 				$orderProducts[] = '{"id": "'.$orderProduct['id_product'].'", "quantity": '.$orderProduct['quantity'].', "price": '.$orderProduct_instance->getPrice(true, null, 2).', "variation_code": "'.$orderProductAttributes.'"}';
+				
+				$paramsAPI['orderProducts'][] = array(
+					'id' => $orderProduct['id_product'],
+					'quantity' => $orderProduct['quantity'],
+					'price' => $orderProduct_instance->getPrice(true, null, 2),
+					'variation_code' => $orderProductAttributes
+					);
 			}
 
 			$orderProducts = '['.implode(', ', $orderProducts).']';
@@ -693,8 +707,44 @@ section.init .btn-init.btn-cta {
 				}
 			';
 
+			$paramsAPI['orderInfo'] = array(
+				'order_no' => $order->id,
+				'lastname' => $address->lastname,
+				'firstname' => $address->firstname,
+				'email' => $customer->email,
+				'phone' => ($address->phone == '' ? $address->phone : $address->phone_mobile),
+				'state' => (isset($address->id_state) ? State::getNameById($address->id_state) : ''),
+				'city' => $address->city,
+				'address' => $address->address1,
+				'discount' => $order->total_discounts,
+				'discount_code' => $discountsCode,
+				'shipping' => $order->total_shipping,
+				'total' => $order->total_paid
+				);
+
+			$resApiOrderSave = $this->_apiOrderSave($paramsAPI);
+
 			return $this->_runJs($js_code);
 		}
+	}
+
+	private function _apiOrderSave($params)
+	{
+		$ra_domain_api_key = Configuration::get('ra_apikey');
+		$ra_token = Configuration::get('ra_token');
+		
+		if ($ra_domain_api_key && $ra_domain_api_key != '' && $ra_token && $ra_token != '')
+		{
+			$client = new Retargeting_REST_API_Client("API_KEY", "TOKEN");
+			$client->setResponseFormat("json");
+			$client->setDecoding(false);
+
+			$response = $client->order->save($params['orderInfo'], $params['orderProducts']);
+
+			return $response;
+		}
+
+		return false;
 	}
 
 	/**

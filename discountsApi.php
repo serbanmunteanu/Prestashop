@@ -26,14 +26,15 @@
 include(dirname(__FILE__).'/../../config/config.inc.php');
 include(dirname(__FILE__).'/../../init.php');
 
-$ra_domain_api_key = Configuration::get('ra_apikey'); 
+// $ra_domain_api_key = Configuration::get('ra_apikey'); 
+$ra_token = Configuration::get('ra_token'); 
 
 $key = Tools::getValue('key');
 $type = Tools::getValue('type');
 $value = Tools::getValue('value');
 $count = Tools::getValue('count');
 
-if ($key != '' && $key == $ra_domain_api_key && !is_bool($type) && !is_bool($value) && !is_bool($count))
+if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !is_bool($count))
 {
 	$generatedCodes = array();
 
