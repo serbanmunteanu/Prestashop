@@ -927,7 +927,14 @@ section.init .btn-init.btn-cta {
 			} else {
 				$product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
 			}
-
+			/*
+			* Img
+			*/
+			
+			$iProt = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,strpos( $_SERVER["SERVER_PROTOCOL"],'/'))).'://';
+			$iType = ImageType::getFormatedName('large');
+			$raImg = $iProt . $link_instance->getImageLink($product_instance->link_rewrite, $product_instance->id.'-'.$id_image['id_image'], $iType);
+			
 			if (_PS_VERSION_ >= '1.5')
 			{
 
@@ -955,7 +962,7 @@ section.init .btn-init.btn-cta {
 					"id": "'.$product_fields['id_product'].'",
 					"name": "'.(is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name).'",
 					"url": "'.$product_instance->getLink().'", 
-				  	"img": "'.$product_image.'", 
+				  	"img": "'.$raImg.'", 
 				  	"price": '.$product_price.',
 					"promo": '.$product_promo.',
 					"stock": '.$product_stock.',
