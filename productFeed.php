@@ -67,16 +67,29 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
 			$product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
 		}
 
+		// echo '
+		// <product>
+		// 	<id>'.$product_fields['id_product'].'</id>
+		// 	<inventory>
+		// 		<variations>0</variations>
+		// 		<stock>'.$product_stock.'</stock>
+		// 	</inventory>
+		// 	<price>'.$product_price.'</price>
+		// 	<promo>'.$product_promo.'</promo>
+		// 	<url>'.$product_instance->getLink().'</url>
+		// 	<image>'.$product_image.'</image>
+		// </product>';
+		
 		echo '
 		<product>
 			<id>'.$product_fields['id_product'].'</id>
-			<stock>'.$product_stock.'</stock>
 			<price>'.$product_price.'</price>
 			<promo>'.$product_promo.'</promo>
-			<url>'.$product_instance->getLink().'</url>
-			<image>'.$product_image.'</image>
+			<inventory>
+				<variations>0</variations>
+				<stock>'.$product_stock.'</stock>
+			</inventory>
 		</product>';
-
 	}
 }
 
