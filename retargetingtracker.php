@@ -373,43 +373,43 @@ section.init .btn-init.btn-cta {
 					'type' => 'text',
 					'label' => $this->l('Add To Cart Button'),
 					'name' => 'ra_qs_addToCart',
-					'desc' => 'Query selector for the button used to add a product to cart.'
+					'desc' => '[Experimental] Query selector for the button used to add a product to cart.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Product Variants Buttons'),
 					'name' => 'ra_qs_variation',
-					'desc' => 'Query selector for the product options used to change the preferences of the product.'
+					'desc' => '[Experimental] Query selector for the product options used to change the preferences of the product.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Add To Wishlist Button'),
 					'name' => 'ra_qs_addToWishlist',
-					'desc' => 'Query selector for the button used to add a product to wishlist.'
+					'desc' => '[Experimental] Query selector for the button used to add a product to wishlist.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Product Images'),
 					'name' => 'ra_qs_productImages',
-					'desc' => 'Query selector for the main product image on a product page.'
+					'desc' => '[Experimental] Query selector for the main product image on a product page.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Submit Review Button'),
 					'name' => 'ra_qs_review',
-					'desc' => 'Query selector for the button used to submit a comment/review for a product.'
+					'desc' => '[Experimental] Query selector for the button used to submit a comment/review for a product.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Price'),
 					'name' => 'ra_qs_price',
-					'desc' => 'Query selector for the main product price on a product page.'
+					'desc' => '[Experimental] Query selector for the main product price on a product page.'
 				),
 				array(
 					'type' => 'text',
 					'label' => $this->l('Old Price'),
 					'name' => 'ra_qs_oldPrice',
-					'desc' => 'Query selector for the main product price without discount on a product page.'
+					'desc' => '[Experimental] Query selector for the main product price without discount on a product page.'
 				),
 			),
 			'submit' => array(
@@ -551,37 +551,37 @@ section.init .btn-init.btn-cta {
 				<label> Add To Cart Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_addToCart" id="ra_qs_addToCart" value="'.Tools::getValue('ra_qs_addToCart', Configuration::get('ra_qs_addToCart')).'" class="">
-                    <p class="clear"> Query selector for the button used to add a product to cart. </p>
+                    <p class="clear"> [Experimental] Query selector for the button used to add a product to cart. </p>
                 </div>
 				<label> Product Variants Buttons </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_variation" id="ra_qs_variation" value="'.Tools::getValue('ra_qs_variation', Configuration::get('ra_qs_variation')).'" class="">
-                    <p class="clear"> Query selector for the product options used to change the preferences of the product. </p>
+                    <p class="clear"> [Experimental] Query selector for the product options used to change the preferences of the product. </p>
                 </div>
 				<label> Add To Wishlist Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_addToWishlist" id="ra_qs_addToWishlist" value="'.Tools::getValue('ra_qs_addToWishlist', Configuration::get('ra_qs_addToWishlist')).'" class="">
-                    <p class="clear"> Query selector for the button used to add a product to wishlist. </p>
+                    <p class="clear"> [Experimental] Query selector for the button used to add a product to wishlist. </p>
                 </div>
 				<label> Product Images </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_productImages" id="ra_qs_productImages" value="'.Tools::getValue('ra_qs_productImages', Configuration::get('ra_qs_productImages')).'" class="">
-                    <p class="clear"> Query selector for the main product image on a product page. </p>
+                    <p class="clear"> [Experimental] Query selector for the main product image on a product page. </p>
                 </div>
 				<label> Submit Review Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_review" id="ra_qs_review" value="'.Tools::getValue('ra_qs_review', Configuration::get('ra_qs_review')).'" class="">
-                    <p class="clear"> Query selector for the button used to submit a comment/review for a product. </p>
+                    <p class="clear"> [Experimental] Query selector for the button used to submit a comment/review for a product. </p>
                 </div>
 				<label> Price </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_price" id="ra_qs_price" value="'.Tools::getValue('ra_qs_price', Configuration::get('ra_qs_price')).'" class="">
-                    <p class="clear"> Query selector for the main product price on a product page. </p>
+                    <p class="clear"> [Experimental] Query selector for the main product price on a product page. </p>
                 </div>
 				<label> Old Price </label>
                 <div class="margin-form">
                     <input type="text" name="ra_oqs_ldPrice" id="ra_qs_oldPrice" value="'.Tools::getValue('ra_qs_oldPrice', Configuration::get('ra_qs_oldPrice')).'" class="">
-                    <p class="clear"> Query selector for the main product price without discount on a product page. </p>
+                    <p class="clear"> [Experimental] Query selector for the main product price without discount on a product page. </p>
                 </div>
 				
 		        <center>
