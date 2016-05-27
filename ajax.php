@@ -50,8 +50,8 @@ function getThumbnailAddToCartJS($id)
 				foreach ($categoryTree as $key => $categoryNode)
 				{
 					if ($categoryNode['is_root_category']) continue;
-					else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
-					else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+					else if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]) )) $js_category = ' "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false ';
+					else if ($key == 0) $js_category = ' "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" ';
 					else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
 					else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
 				}
@@ -61,8 +61,8 @@ function getThumbnailAddToCartJS($id)
 				$categoryTree = $category_instance->getParentsCategories();
 				foreach ($categoryTree as $key => $categoryNode)
 				{
-					if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]) )) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
-					else if ($key == 0) $js_category = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
+					if ($key == 0 && ( (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]) )) $js_category = ' "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false ';
+					else if ($key == 0) $js_category = ' "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" ';
 					else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": false }';
 					else $arr_categoryBreadcrumb[] = '{ "id": "'.$categoryNode['id_category'].'", "name": "'.$categoryNode['name'].'", "parent": "'.$categoryNode['id_parent'].'" }';
 				}
@@ -70,6 +70,7 @@ function getThumbnailAddToCartJS($id)
 		}
 
 		$js_categoryBreadcrumb = '['.implode(', ', $arr_categoryBreadcrumb).']';
+		$js_category = '[{ '.$js_category.', breadcrumb: '.$js_categoryBreadcrumb.' }]';
 
 		$js_variation = 'false';
 		$vid = Product::getDefaultAttribute((int)$id);
@@ -97,6 +98,7 @@ function getThumbnailAddToCartJS($id)
 					$js_variationDetails = implode(', ', $arr_variationDetails);
 					$js_variation = '{
 						"code": "'.$js_variationCode.'",
+						"stock": '.($product_instance->available_now == 'In stock' ? 1 : 0).',
 						"details": {
 							'.$js_variationDetails.'
 						}
@@ -131,6 +133,7 @@ function getThumbnailAddToCartJS($id)
 					$js_variationDetails = implode(', ', $arr_variationDetails);
 					$js_variation = '{
 						"code": "'.$js_variationCode.'",
+						"stock": '.(Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0).',
 						"details": {
 							'.$js_variationDetails.'
 						}
@@ -173,10 +176,12 @@ function getThumbnailAddToCartJS($id)
 			  	"img": "'.$product_image.'", 
 			  	"price": '.$product_price.',
 				"promo": '.$product_promo.',
-				"stock": '.$product_stock.',
 				"brand": '.($product_instance->manufacturer_name != '' ? '"'.$product_instance->manufacturer_name.'"' : 'false').',
 				"category": '.$js_category.',
-				"category_breadcrumb": '.$js_categoryBreadcrumb.'
+				"inventory": {
+					"variations": false,
+					"stock": '.$product_stock.'
+				}
 			}, function() {
 				_ra.addToCart("'.$product_fields['id_product'].'", '.$js_variation.');
 			});
@@ -189,9 +194,10 @@ function getThumbnailAddToCartJS($id)
 function getProductAddToCartJS($id, $vid)
 {	
 	$js_variation = 'false';
-	
+		
 	if (_PS_VERSION_ >= '1.5')
 	{
+		$product_instance = new Product($id);
 		$productAtttributes = Product::getAttributesParams((int)$id, (int)$vid);
 		if (count($productAtttributes) > 0)
 		{
@@ -212,6 +218,7 @@ function getProductAddToCartJS($id, $vid)
 			$js_variationDetails = implode(', ', $arr_variationDetails);
 			$js_variation = '{
 				"code": "'.$js_variationCode.'",
+				"stock": '.($product_instance->available_now == 'In stock' ? 1 : 0).',
 				"details": {
 					'.$js_variationDetails.'
 				}
@@ -221,6 +228,7 @@ function getProductAddToCartJS($id, $vid)
 	else
 	{
 		$product_instance = new Product($id, 1);
+		$product_fields = $product_instance->getFields();
 		$productAtttributes = $product_instance->getAttributeCombinaisons(1);
 
 		if (count($productAtttributes) > 0)
@@ -246,6 +254,7 @@ function getProductAddToCartJS($id, $vid)
 			$js_variationDetails = implode(', ', $arr_variationDetails);
 			$js_variation = '{
 				"code": "'.$js_variationCode.'",
+				"stock": '.(Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0).',
 				"details": {
 					'.$js_variationDetails.'
 				}
@@ -253,7 +262,7 @@ function getProductAddToCartJS($id, $vid)
 		}
 	}
 
-	$js_code = '_ra.addToCart("'.$id.'", '.$js_variation.');';
+	$js_code = '_ra.addToCart("'.$id.'", 1, '.$js_variation.');';
 
 	return $js_code;
 }
@@ -264,6 +273,7 @@ function getSetVariationJS($id, $vid)
 	
 	if (_PS_VERSION_ >= '1.5')
 	{
+		$product_instance = new Product($id);
 		$productAtttributes = Product::getAttributesParams((int)$id, (int)$vid);
 		if (count($productAtttributes) > 0)
 		{
@@ -284,6 +294,7 @@ function getSetVariationJS($id, $vid)
 			$js_variationDetails = implode(', ', $arr_variationDetails);
 			$js_variation = '{
 				"code": "'.$js_variationCode.'",
+				"stock": '.($product_instance->available_now == 'In stock' ? 1 : 0).',
 				"details": {
 					'.$js_variationDetails.'
 				}
@@ -293,6 +304,7 @@ function getSetVariationJS($id, $vid)
 	else
 	{
 		$product_instance = new Product($id, 1);
+		$product_fields = $product_instance->getFields();
 		$productAtttributes = $product_instance->getAttributeCombinaisons(1);
 
 		if (count($productAtttributes) > 0)
@@ -318,6 +330,7 @@ function getSetVariationJS($id, $vid)
 			$js_variationDetails = implode(', ', $arr_variationDetails);
 			$js_variation = '{
 				"code": "'.$js_variationCode.'",
+				"stock": '.(Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0).',
 				"details": {
 					'.$js_variationDetails.'
 				}
