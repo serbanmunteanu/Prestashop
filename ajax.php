@@ -183,7 +183,7 @@ function getThumbnailAddToCartJS($id)
 					"stock": '.$product_stock.'
 				}
 			}, function() {
-				_ra.addToCart("'.$product_fields['id_product'].'", '.$js_variation.');
+				_ra.addToCart("'.$product_fields['id_product'].'", 1, '.$js_variation.');
 			});
 		';
 	}
