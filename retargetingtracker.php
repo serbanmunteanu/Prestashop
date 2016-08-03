@@ -1058,7 +1058,7 @@ section.init .btn-init.btn-cta {
 			* Img
 			*/
 			
-			$iProt = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,strpos( $_SERVER["SERVER_PROTOCOL"],'/'))).'://';
+			$iProt = Tools::strtolower(Tools::substr($_SERVER["SERVER_PROTOCOL"],0,strpos( $_SERVER["SERVER_PROTOCOL"],'/'))).'://';
 			$iType = ImageType::getFormatedName('large');
 			$raImg = $iProt . $link_instance->getImageLink($product_instance->link_rewrite, $product_instance->id.'-'.$id_image['id_image'], $iType);
 			
