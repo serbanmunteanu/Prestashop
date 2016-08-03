@@ -158,7 +158,9 @@ class RetargetingTracker extends Module
 
             foreach (CMS::listCMS() as $cmsPage) {
                 $option = (string)Tools::getValue('ra_opt_visitHelpPage_' . $cmsPage['id_cms']);
-                if ($option == 'on') $ra_opt_visitHelpPages[] = $cmsPage['id_cms'];
+                if ($option == 'on') {
+                    $ra_opt_visitHelpPages[] = $cmsPage['id_cms'];
+                }
             }
 
             Configuration::updateValue('ra_opt_visitHelpPage', implode('|', $ra_opt_visitHelpPages));
@@ -176,8 +178,11 @@ class RetargetingTracker extends Module
         if (Configuration::get('ra_init') == 'false') {
             return $this->displayInitForm();
         } else {
-            if (_PS_VERSION_ < '1.5') return $this->displayFormManually(); else
+            if (_PS_VERSION_ < '1.5') {
+                return $this->displayFormManually();
+            } else {
                 return $this->displayForm();
+            }
         }
     }
 
@@ -330,7 +335,9 @@ section.init .btn-init.btn-cta {
         $helper->fields_value['ra_discountApiUrl'] = Configuration::get('ra_discountApiUrl') != '' ? Configuration::get('ra_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params';
 
         $options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
-        foreach ($options_visitHelpPages as $option) $helper->fields_value['ra_opt_visitHelpPage_' . $option] = true;
+        foreach ($options_visitHelpPages as $option) {
+            $helper->fields_value['ra_opt_visitHelpPage_' . $option] = true;
+        }
 
         $helper->fields_value['ra_mediaServerProtocol'] = Configuration::get('ra_mediaServerProtocol');
 
@@ -476,12 +483,16 @@ section.init .btn-init.btn-cta {
     {
         $this->controller = $this->getCurrentController();
 
-        if (empty($this->controller)) return '/*<script>console.info("Retargeting Info: Can\'t get current Controller details..");</script>*/';
+        if (empty($this->controller)) {
+            return '/*<script>console.info("Retargeting Info: Can\'t get current Controller details..");</script>*/';
+        }
 
         // embedd RA.js
         $js_code = $this->_assignEmbedding();
 
-        if (!$js_code) return;
+        if (!$js_code) {
+            return;
+        }
 
         // setEmail
         if ($this->context->cookie->ra_setEmail != '') {
@@ -758,8 +769,11 @@ section.init .btn-init.btn-cta {
     }
 
     protected function _assignSendCategory() {
-        if (method_exists($this->context->controller, 'getCategory')) $category_instance = $this->context->controller->getCategory(); else
+        if (method_exists($this->context->controller, 'getCategory')) {
+            $category_instance = $this->context->controller->getCategory();
+        } else{
             $category_instance = new Category((int)Tools::getValue('id_category'), $this->context->language->id);
+        }
 
         $js_category = array();
         $arr_categoryBreadcrumb = array();
@@ -768,7 +782,17 @@ section.init .btn-init.btn-cta {
             if (_PS_VERSION_ >= '1.5') {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
-                    if ($categoryNode['is_root_category']) continue; else if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false'; else if ($key == 0) $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"'; else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }'; else $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    if ($categoryNode['is_root_category']) {
+                        continue;
+                    } elseif ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
+                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false';
+                    } elseif ($key == 0) {
+                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"';
+                    } elseif (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                    } else {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    }
                 }
             } else {
                 $categoryTree = $category_instance->getParentsCategories();
@@ -796,8 +820,11 @@ section.init .btn-init.btn-cta {
     protected function _assignSendBrand() {
         $js_code = '';
 
-        if (method_exists($this->context->controller, 'getManufacturer')) $brand_instance = $this->context->controller->getManufacturer(); else
+        if (method_exists($this->context->controller, 'getManufacturer')) {
+            $brand_instance = $this->context->controller->getManufacturer();
+        } else {
             $brand_instance = new Manufacturer((int)Tools::getValue('id_manufacturer'), $this->context->language->id);
+        }
 
         if (Validate::isLoadedObject($brand_instance)) {
             $js_code .= 'var _ra = _ra || {};
@@ -818,8 +845,11 @@ section.init .btn-init.btn-cta {
     protected function _assignSendProduct() {
         $link_instance = new LinkCore();
 
-        if (method_exists($this->context->controller, 'getProduct')) $product_instance = $this->context->controller->getProduct(); else
+        if (method_exists($this->context->controller, 'getProduct')) {
+            $product_instance = $this->context->controller->getProduct();
+        } else {
             $product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
+        }
 
         if (Validate::isLoadedObject($product_instance)) {
             $product_fields = $product_instance->getFields();
@@ -837,7 +867,15 @@ section.init .btn-init.btn-cta {
                 } else {
                     $categoryTree = $category_instance->getParentsCategories();
                     foreach ($categoryTree as $key => $categoryNode) {
-                        if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false '; else if ($key == 0) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" '; else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }'; else $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
+                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                        } elseif ($key == 0) {
+                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                        } elseif ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
+                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        } else {
+                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        }
                     }
                 }
             }
@@ -858,8 +896,11 @@ section.init .btn-init.btn-cta {
             $id_image = Product::getCover($product_fields['id_product']);
             if (sizeof($id_image) > 0) {
                 $image = new Image($id_image['id_image']);
-                if (_PS_VERSION_ >= '1.5') $product_image = $imgDomain . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg"; else
+                if (_PS_VERSION_ >= '1.5') {
+                    $product_image = $imgDomain . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg";
+                } else{
                     $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
+                }
             } else {
                 $product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
             }
@@ -1162,7 +1203,9 @@ section.init .btn-init.btn-cta {
 
     protected function getCurrentController() {
         // For Prestashop v1.5 and ..
-        if (_PS_VERSION_ >= '1.5') return Dispatcher::getInstance()->getController();
+        if (_PS_VERSION_ >= '1.5') {
+            return Dispatcher::getInstance()->getController();
+        }
 
         // For Prestashop v1.4
         $script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
