@@ -23,7 +23,9 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-if (!defined('_PS_VERSION_')) exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 include(dirname(__FILE__) . '/lib/retargeting-rest-api/Client.php');
 
@@ -45,21 +47,80 @@ class RetargetingTracker extends Module {
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-        if (!Configuration::get('ra_apikey') || Configuration::get('ra_apikey') == '') $this->warning = $this->l('No Domain API Key provided');
+        if (!Configuration::get('ra_apikey') || Configuration::get('ra_apikey') == '') {
+            $this->warning = $this->l('No Domain API Key provided');
+        }
 
         /* Backward compatibility */
-        if (_PS_VERSION_ < '1.5') require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
+        if (_PS_VERSION_ < '1.5') {
+            require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
+        }
     }
 
     public function install() {
-        if (_PS_VERSION_ >= '1.5' && Shop::isFeatureActive()) Shop::setContext(Shop::CONTEXT_ALL);
+        if (_PS_VERSION_ >= '1.5' && Shop::isFeatureActive()) {
+            Shop::setContext(Shop::CONTEXT_ALL);
+        }
 
-        if (_PS_VERSION_ >= '1.5') return parent::install() && Configuration::updateValue('ra_apikey', '') && Configuration::updateValue('ra_token', '') && Configuration::updateValue('ra_productFeedUrl', '') && Configuration::updateValue('ra_discountApiUrl', '') && Configuration::updateValue('ra_opt_visitHelpPage', '') && Configuration::updateValue('ra_mediaServerProtocol', 'http://') && Configuration::updateValue('ra_qs_addToCart', '') && Configuration::updateValue('ra_qs_variation', '') && Configuration::updateValue('ra_qs_addToWishlist', '') && Configuration::updateValue('ra_qs_productImages', '') && Configuration::updateValue('ra_qs_review', '') && Configuration::updateValue('ra_qs_price', '') && Configuration::updateValue('ra_qs_oldPrice', '') && Configuration::updateValue('ra_init', 'false') && $this->registerHook('displayHome') && $this->registerHook('displayHeader') && $this->registerHook('displayOrderConfirmation') && $this->registerHook('actionAuthentication') && $this->registerHook('actionCustomerAccountAdd'); else
-            return parent::install() && Configuration::updateValue('ra_apikey', '') && Configuration::updateValue('ra_token', '') && Configuration::updateValue('ra_productFeedUrl', '') && Configuration::updateValue('ra_discountApiUrl', '') && Configuration::updateValue('ra_opt_visitHelpPage', '') && Configuration::updateValue('ra_qs_addToCart', '') && Configuration::updateValue('ra_qs_variation', '') && Configuration::updateValue('ra_qs_addToWishlist', '') && Configuration::updateValue('ra_qs_productImages', '') && Configuration::updateValue('ra_qs_review', '') && Configuration::updateValue('ra_qs_price', '') && Configuration::updateValue('ra_qs_oldPrice', '') && Configuration::updateValue('ra_init', 'false') && $this->registerHook('header') && $this->registerHook('orderConfirmation') && $this->registerHook('authentication') && $this->registerHook('createAccount');
+        if (_PS_VERSION_ >= '1.5') {
+            return parent::install() &&
+                Configuration::updateValue('ra_apikey', '') &&
+                Configuration::updateValue('ra_token', '') &&
+                Configuration::updateValue('ra_productFeedUrl', '') &&
+                Configuration::updateValue('ra_discountApiUrl', '') &&
+                Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+                Configuration::updateValue('ra_mediaServerProtocol', 'http://') &&
+                Configuration::updateValue('ra_qs_addToCart', '') &&
+                Configuration::updateValue('ra_qs_variation', '') &&
+                Configuration::updateValue('ra_qs_addToWishlist', '') &&
+                Configuration::updateValue('ra_qs_productImages', '') &&
+                Configuration::updateValue('ra_qs_review', '') &&
+                Configuration::updateValue('ra_qs_price', '') &&
+                Configuration::updateValue('ra_qs_oldPrice', '') &&
+                Configuration::updateValue('ra_init', 'false') &&
+                $this->registerHook('displayHome') &&
+                $this->registerHook('displayHeader') &&
+                $this->registerHook('displayOrderConfirmation') &&
+                $this->registerHook('actionAuthentication') &&
+                $this->registerHook('actionCustomerAccountAdd');
+        } else {
+            return parent::install() &&
+                Configuration::updateValue('ra_apikey', '') &&
+                Configuration::updateValue('ra_token', '') &&
+                Configuration::updateValue('ra_productFeedUrl', '') &&
+                Configuration::updateValue('ra_discountApiUrl', '') &&
+                Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+                Configuration::updateValue('ra_qs_addToCart', '') &&
+                Configuration::updateValue('ra_qs_variation', '') &&
+                Configuration::updateValue('ra_qs_addToWishlist', '') &&
+                Configuration::updateValue('ra_qs_productImages', '') &&
+                Configuration::updateValue('ra_qs_review', '') &&
+                Configuration::updateValue('ra_qs_price', '') &&
+                Configuration::updateValue('ra_qs_oldPrice', '') &&
+                Configuration::updateValue('ra_init', 'false') &&
+                $this->registerHook('header') &&
+                $this->registerHook('orderConfirmation') &&
+                $this->registerHook('authentication') &&
+                $this->registerHook('createAccount');
+        }
     }
 
     public function uninstall() {
-        return Configuration::deleteByName('ra_apikey') && Configuration::deleteByName('ra_token') && Configuration::deleteByName('ra_productFeedUrl') && Configuration::deleteByName('ra_discountApiUrl') && Configuration::deleteByName('ra_opt_visitHelpPage') && Configuration::deleteByName('ra_mediaServerProtocol') && Configuration::deleteByName('ra_qs_addToCart', '') && Configuration::deleteByName('ra_qs_variation', '') && Configuration::deleteByName('ra_qs_addToWishlist', '') && Configuration::deleteByName('ra_qs_productImages', '') && Configuration::deleteByName('ra_qs_review', '') && Configuration::deleteByName('ra_qs_price', '') && Configuration::deleteByName('ra_qs_oldPrice', '') && Configuration::deleteByName('ra_init') && parent::uninstall();
+        return Configuration::deleteByName('ra_apikey') &&
+            Configuration::deleteByName('ra_token') &&
+            Configuration::deleteByName('ra_productFeedUrl') &&
+            Configuration::deleteByName('ra_discountApiUrl') &&
+            Configuration::deleteByName('ra_opt_visitHelpPage') &&
+            Configuration::deleteByName('ra_mediaServerProtocol') &&
+            Configuration::deleteByName('ra_qs_addToCart', '') &&
+            Configuration::deleteByName('ra_qs_variation', '') &&
+            Configuration::deleteByName('ra_qs_addToWishlist', '') &&
+            Configuration::deleteByName('ra_qs_productImages', '') &&
+            Configuration::deleteByName('ra_qs_review', '') &&
+            Configuration::deleteByName('ra_qs_price', '') &&
+            Configuration::deleteByName('ra_qs_oldPrice', '') &&
+            Configuration::deleteByName('ra_init') &&
+            parent::uninstall();
     }
 
     public function getContent() {
@@ -117,7 +178,10 @@ class RetargetingTracker extends Module {
 
     public function displayInitForm() {
         // Form Tags
-        $form = '<form id="configuration_form" class="initForm defaultForm form-horizontal retargetingtracker" action="' . $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data" novalidate="">';
+        $form = '
+            <form id="configuration_form" class="initForm defaultForm form-horizontal retargetingtracker" action="' .
+            $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data" novalidate="">
+        ';
 
         // Basic Settings
         $form .= '
