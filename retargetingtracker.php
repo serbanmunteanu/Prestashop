@@ -29,8 +29,10 @@ if (!defined('_PS_VERSION_')) {
 
 include(dirname(__FILE__) . '/lib/retargeting-rest-api/Client.php');
 
-class RetargetingTracker extends Module {
-    public function __construct() {
+class RetargetingTracker extends Module
+{
+    public function __construct()
+    {
         $this->name = 'retargetingtracker';
         $this->tab = 'analytics_stats';
         $this->version = '1.0.3';
@@ -57,7 +59,8 @@ class RetargetingTracker extends Module {
         }
     }
 
-    public function install() {
+    public function install()
+    {
         if (_PS_VERSION_ >= '1.5' && Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
@@ -105,7 +108,8 @@ class RetargetingTracker extends Module {
         }
     }
 
-    public function uninstall() {
+    public function uninstall()
+    {
         return Configuration::deleteByName('ra_apikey') &&
             Configuration::deleteByName('ra_token') &&
             Configuration::deleteByName('ra_productFeedUrl') &&
@@ -123,7 +127,8 @@ class RetargetingTracker extends Module {
             parent::uninstall();
     }
 
-    public function getContent() {
+    public function getContent()
+    {
         $output = null;
 
         if (Tools::isSubmit('submitDisableInit')) {
@@ -176,7 +181,8 @@ class RetargetingTracker extends Module {
         }
     }
 
-    public function displayInitForm() {
+    public function displayInitForm()
+    {
         // Form Tags
         $form = '
             <form id="configuration_form" class="initForm defaultForm form-horizontal retargetingtracker" action="' .
@@ -283,7 +289,8 @@ section.init .btn-init.btn-cta {
         return $form;
     }
 
-    public function displayForm() {
+    public function displayForm()
+    {
         // Get default language
         $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
 
@@ -338,7 +345,8 @@ section.init .btn-init.btn-cta {
         return $helper->generateForm($fields_form);
     }
 
-    public function displayFormManually() {
+    public function displayFormManually()
+    {
         // Form Tags
         $form = '<form id="configuration_form" class="defaultForm form-horizontal retargetingtracker" action="' . $_SERVER['REQUEST_URI'] . '" method="post" enctype="multipart/form-data" novalidate="">';
 
@@ -464,7 +472,8 @@ section.init .btn-init.btn-cta {
      * Triggers Embedding
      * ----------------------------------------------------------
      */
-    public function hookHeader() {
+    public function hookHeader()
+    {
         $this->controller = $this->getCurrentController();
 
         if (empty($this->controller)) return '/*<script>console.info("Retargeting Info: Can\'t get current Controller details..");</script>*/';
@@ -566,32 +575,37 @@ section.init .btn-init.btn-cta {
     /**
      * setEmail - hook for customer authentification (except registration)
      */
-    public function hookActionAuthentication() {
+    public function hookActionAuthentication()
+    {
         $this->prepSetEmailJS();
     }
 
     /**
      * setEmail - hook for customer authentification (except registration)
      */
-    public function hookAuthentication() {
+    public function hookAuthentication()
+    {
         $this->prepSetEmailJS();
     }
 
     /**
      * setEmail - hook for customer registration
      */
-    public function hookActionCustomerAccountAdd() {
+    public function hookActionCustomerAccountAdd()
+    {
         $this->prepSetEmailJS();
     }
 
     /**
      * setEmail - hook for customer registration
      */
-    public function hookCreateAccount() {
+    public function hookCreateAccount()
+    {
         $this->prepSetEmailJS();
     }
 
-    protected function prepSetEmailJS() {
+    protected function prepSetEmailJS()
+    {
         $customer = $this->context->customer;
 
         $js_code = 'var _ra = _ra || {};
@@ -611,7 +625,8 @@ section.init .btn-init.btn-cta {
     /**
      * saveOrder - hook for order confirmation
      */
-    public function hookOrderConfirmation($params) {
+    public function hookOrderConfirmation($params)
+    {
         $js_code = '';
 
         $order = $params['objOrder'];
