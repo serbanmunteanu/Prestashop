@@ -412,7 +412,9 @@ section.init .btn-init.btn-cta {
 
         $options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
         $helpPagesChecked = array();
-        foreach ($options_visitHelpPages as $option) $helpPagesChecked['ra_opt_visitHelpPage_' . $option] = true;
+        foreach ($options_visitHelpPages as $option) {
+            $helpPagesChecked['ra_opt_visitHelpPage_' . $option] = true;
+        }
 
         foreach (CMS::listCMS() as $page) {
             $form .= '
@@ -774,7 +776,7 @@ section.init .btn-init.btn-cta {
     {
         if (method_exists($this->context->controller, 'getCategory')) {
             $category_instance = $this->context->controller->getCategory();
-        } else{
+        } else {
             $category_instance = new Category((int)Tools::getValue('id_category'), $this->context->language->id);
         }
 
@@ -921,7 +923,7 @@ section.init .btn-init.btn-cta {
                 $image = new Image($id_image['id_image']);
                 if (_PS_VERSION_ >= '1.5') {
                     $product_image = $imgDomain . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg";
-                } else{
+                } else {
                     $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
                 }
             } else {

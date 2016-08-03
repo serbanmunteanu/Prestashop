@@ -63,7 +63,7 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
         } else {
             $product_price = $product_instance->getPrice(true, null, 2, null, false, false);
             if ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2)) {
-                $product_promo = $product_instance->getPrice(true, null, 2)
+                $product_promo = $product_instance->getPrice(true, null, 2);
             } else {
                 $product_promo = 0;
             }
