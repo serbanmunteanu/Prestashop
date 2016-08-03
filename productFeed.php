@@ -51,8 +51,7 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
                     $image->id_image . "-large.jpg";
             }
         } else {
-            $product_image = $link_instance->getImageLink(
-                $product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
+            $product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
         }
 
         if (_PS_VERSION_ >= '1.5') {
