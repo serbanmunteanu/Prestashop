@@ -42,7 +42,9 @@ if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !i
         $cart_rule = new CartRuleCore();
 
         $cart_rule_code = '';
-        while ($cart_rule_code == '' || CartRuleCore::getIdByCode($cart_rule_code)) $cart_rule_code = Tools::strtoupper(Tools::passwdGen(8));
+        while ($cart_rule_code == '' || CartRuleCore::getIdByCode($cart_rule_code)) {
+            $cart_rule_code = Tools::strtoupper(Tools::passwdGen(8));
+        }
 
         $cart_rule_name = 'RA-' . $type . '-' . $value . '-' . $cart_rule_code;
 
