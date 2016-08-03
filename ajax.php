@@ -26,7 +26,8 @@
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 
-function getThumbnailAddToCartJS($id) {
+function getThumbnailAddToCartJS($id)
+{
     $js_code = '';
 
     $link_instance = new LinkCore();
@@ -190,7 +191,8 @@ function getThumbnailAddToCartJS($id) {
  * @param $image
  * @return string
  */
-function retargetingProductImageBuildNew($image) {
+function retargetingProductImageBuildNew($image)
+{
     $base_url = _PS_BASE_URL_;
     $theme_prod_dir = _THEME_PROD_DIR_;
     $imagePath = $image->getExistingImgPath();
@@ -202,11 +204,13 @@ function retargetingProductImageBuildNew($image) {
  * @param $image
  * @return string
  */
-function retargetingProductImageBuilder($image) {
+function retargetingProductImageBuilder($image)
+{
     return _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
 }
 
-function getProductAddToCartJS($id, $vid) {
+function getProductAddToCartJS($id, $vid)
+{
     $js_variation = 'false';
 
     if (_PS_VERSION_ >= '1.5') {
@@ -273,7 +277,8 @@ function getProductAddToCartJS($id, $vid) {
     return $js_code;
 }
 
-function getSetVariationJS($id, $vid) {
+function getSetVariationJS($id, $vid)
+{
     $js_variation = 'false';
 
     if (_PS_VERSION_ >= '1.5') {
