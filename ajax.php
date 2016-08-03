@@ -350,5 +350,5 @@ if (Tools::getValue('ajax') == 'true' && Tools::getValue('method')) {
         die(getSetVariationJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
     } elseif (Tools::getValue('method') == '') die('ERROR : No valid method selected.');
 } else {
-    die('ERROR : Invalid parametres.');
+    die('ERROR: Invalid parametres.');
 }
