@@ -1,6 +1,6 @@
 <?php
 /**
- * 2014-2015 Retargeting SRL
+ * 2014-2016 Retargeting BIZ SRL
  *
  * NOTICE OF LICENSE
  *
@@ -34,8 +34,8 @@ class RetargetingTracker extends Module
 	{
 		$this->name = 'retargetingtracker';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.0.2';
-		$this->author = 'Cosmin Atomei';
+		$this->version = '1.0.3';
+		$this->author = 'Retargeting Team';
 		$this->module_key = '07f632866f76537ce3f8f01eedad4f00';
 		$this->need_instance = 0;
 		$this->ps_versions_compliancy = array('min' => '1.4', 'max' => _PS_VERSION_); 
