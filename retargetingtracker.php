@@ -719,7 +719,8 @@ section.init .btn-init.btn-cta {
         }
     }
 
-    private function _apiOrderSave($params) {
+    private function _apiOrderSave($params)
+    {
         $ra_domain_api_key = Configuration::get('ra_apikey');
         $ra_token = Configuration::get('ra_token');
 
@@ -741,7 +742,8 @@ section.init .btn-init.btn-cta {
      * ----------------------------------------------------------
      */
 
-    protected function _assignEmbedding() {
+    protected function _assignEmbedding()
+    {
         $js_embedd = false;
 
 
@@ -768,7 +770,8 @@ section.init .btn-init.btn-cta {
         return $js_embedd;
     }
 
-    protected function _assignSendCategory() {
+    protected function _assignSendCategory()
+    {
         if (method_exists($this->context->controller, 'getCategory')) {
             $category_instance = $this->context->controller->getCategory();
         } else{
@@ -797,7 +800,15 @@ section.init .btn-init.btn-cta {
             } else {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
-                    if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false'; else if ($key == 0) $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"'; else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }'; else $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
+                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false';
+                    } elseif ($key == 0) {
+                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"';
+                    } elseif ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                    } else {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    }
                 }
             }
         }
@@ -817,7 +828,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignSendBrand() {
+    protected function _assignSendBrand()
+    {
         $js_code = '';
 
         if (method_exists($this->context->controller, 'getManufacturer')) {
@@ -842,7 +854,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignSendProduct() {
+    protected function _assignSendProduct()
+    {
         $link_instance = new LinkCore();
 
         if (method_exists($this->context->controller, 'getProduct')) {
@@ -862,7 +875,17 @@ section.init .btn-init.btn-cta {
                 if (_PS_VERSION_ >= '1.5') {
                     $categoryTree = $category_instance->getParentsCategories();
                     foreach ($categoryTree as $key => $categoryNode) {
-                        if ($categoryNode['is_root_category']) continue; else if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false '; else if ($key == 0) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" '; else if (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }'; else $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        if ($categoryNode['is_root_category']) {
+                            continue;
+                        } elseif ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
+                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                        } elseif ($key == 0) {
+                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                        } elseif (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) {
+                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        } else {
+                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        }
                     }
                 } else {
                     $categoryTree = $category_instance->getParentsCategories();
@@ -956,7 +979,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignAddToCart($controller) {
+    protected function _assignAddToCart($controller)
+    {
         $js_code = '
 			if (typeof ajaxCart !== "undefined") {
 				var _ra_ajaxCart_add = ajaxCart.add;
@@ -1001,7 +1025,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignSetVariation() {
+    protected function _assignSetVariation()
+    {
         $js_code = 'function _ra_setVariation() {
 				var pid = $("#product_page_product_id").val(),
 					vid = $("#idCombination").val();
@@ -1041,7 +1066,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignClickImage() {
+    protected function _assignClickImage()
+    {
         $ra_productImages = (Configuration::get('ra_qs_productImages') != '' ? Configuration::get('ra_qs_productImages') : '#image-block');
 
         $js_code = 'function _ra_clickImage() {
@@ -1054,7 +1080,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignCommentOnProduct() {
+    protected function _assignCommentOnProduct()
+    {
         $ra_review = (Configuration::get('ra_qs_review') != '' ? Configuration::get('ra_qs_review') : '#submitNewMessage');
 
         $js_code = 'function _ra_commentOnProduct() {
@@ -1067,9 +1094,13 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignMouseOverPrice() {
-        if (method_exists($this->context->controller, 'getProduct')) $product_instance = $this->context->controller->getProduct(); else
+    protected function _assignMouseOverPrice()
+    {
+        if (method_exists($this->context->controller, 'getProduct')) {
+            $product_instance = $this->context->controller->getProduct();
+        } else {
             $product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
+        }
 
         if (Validate::isLoadedObject($product_instance)) {
             $product_fields = $product_instance->getFields();
@@ -1104,7 +1135,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignMouseOverAddToCart() {
+    protected function _assignMouseOverAddToCart()
+    {
         if (method_exists($this->context->controller, 'getProduct')) $product_instance = $this->context->controller->getProduct(); else
             $product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
 
@@ -1123,7 +1155,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignLikeFacebook() {
+    protected function _assignLikeFacebook()
+    {
         $js_code = 'if (typeof FB != "undefined") {
 				FB.Event.subscribe("edge.create", function () {
 					_ra.likeFacebook($("#product_page_product_id").val());
@@ -1157,7 +1190,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignCheckoutIds() {
+    protected function _assignCheckoutIds()
+    {
         $cart_instance = $this->context->cart;
         $cartProducts = $cart_instance->getProducts();
 
@@ -1177,7 +1211,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignSetCartUrl() {
+    protected function _assignSetCartUrl()
+    {
         $js_code = ' var _ra = _ra || {};
 			_ra.setCartUrlInfo = {
 				"url": window.location.toString()
@@ -1194,14 +1229,16 @@ section.init .btn-init.btn-cta {
     /**
      * Wrap JS to be written on page
      */
-    private function _runJs($js_code) {
+    private function _runJs($js_code)
+    {
         return '
 		<script type="text/javascript" id="ra">
 			' . $js_code . '
 		</script>';
     }
 
-    protected function getCurrentController() {
+    protected function getCurrentController()
+    {
         // For Prestashop v1.5 and ..
         if (_PS_VERSION_ >= '1.5') {
             return Dispatcher::getInstance()->getController();
