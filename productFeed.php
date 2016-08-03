@@ -44,11 +44,9 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
         if (sizeof($id_image) > 0) {
             $image = new Image($id_image['id_image']);
             if (_PS_VERSION_ >= '1.5') {
-                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" .
-                    ImageType::getFormatedName('large') . ".jpg";
+                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg";
             } else {
-                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" .
-                    $image->id_image . "-large.jpg";
+                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
             }
         } else {
             $product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
