@@ -535,7 +535,7 @@ section.init .btn-init.btn-cta {
 		foreach ($options_visitHelpPages as $option) 
 			$helpPagesChecked['ra_opt_visitHelpPage_'.$option] = true;
 
-		foreach (CMS::listCMS() as $key => $page) {
+		foreach (CMS::listCMS() as $page) {
 			$form .= '
 			<div>
 					<input type="checkbox" name="ra_opt_visitHelpPage_'.$page['id_cms'].'" id="ra_opt_visitHelpPage_'.$page['id_cms'].'" class="" '.(!empty($helpPagesChecked['ra_opt_visitHelpPage_'.$page['id_cms']]) ? 'checked="checked"' : 'notchecked').'>
@@ -850,7 +850,7 @@ section.init .btn-init.btn-cta {
 				'total' => $order->total_paid
 				);
 
-			$resApiOrderSave = $this->_apiOrderSave($paramsAPI);
+			$this->_apiOrderSave($paramsAPI);
 
 			return $this->_runJs($js_code);
 		}
@@ -1043,7 +1043,7 @@ section.init .btn-init.btn-cta {
 				$imgDomain = Configuration::get('ra_mediaServerProtocol') . _MEDIA_SERVER_3_;
 			}
 
-			$product_image = '';
+//			$product_image = '';
 			$id_image = Product::getCover($product_fields['id_product']);
 			if (sizeof($id_image) > 0) {
 				$image = new Image($id_image['id_image']);
