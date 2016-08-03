@@ -55,7 +55,7 @@ if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !i
         }
 
         $cart_rule->name = $array;
-        $cart_rule->description = 'Cart rule created by Retargeting: RA-' . $type . '-' . $value . '-' . $cart_rule_code;
+        $cart_rule->description = 'Cart rule created by Retargeting: RA-'.$type.'-'.$value.'-'.$cart_rule_code;
         $cart_rule->code = $cart_rule_code;
         $cart_rule->active = 1;
         $cart_rule->date_from = date('Y-m-d h:i:s');
@@ -66,9 +66,9 @@ if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !i
 
         if ($type == 0) {
             $cart_rule->reduction_amount = $value;
-        } else if ($type == 1) {
+        } elseif ($type == 1) {
             $cart_rule->reduction_percent = $value;
-        } else if ($type == 2) {
+        } elseif ($type == 2) {
             $cart_rule->free_shipping = true;
         } else {
             echo Tools::jsonEncode(array('status' => false, 'error' => '0003: Invalid Parameters!'));

@@ -44,38 +44,36 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
         if (sizeof($id_image) > 0) {
             $image = new Image($id_image['id_image']);
             if (_PS_VERSION_ >= '1.5') {
-                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg";
+                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" .
+                    ImageType::getFormatedName('large') . ".jpg";
             } else {
-                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
+                $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" .
+                    $image->id_image . "-large.jpg";
             }
         } else {
-            $product_image = $link_instance->getImageLink($product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
+            $product_image = $link_instance->getImageLink(
+                $product_instance->link_rewrite,
+                $product_fields['id_product'], ImageType::getFormatedName('large'));
         }
 
         if (_PS_VERSION_ >= '1.5') {
             $product_price = $product_instance->getPriceWithoutReduct(true, null, 2);
-            $product_promo = ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice() ? $product_instance->getPrice(true, null, 2) : 0);
-
+            if ($product_instance->getPriceWithoutReduct() > $product_instance->getPrice()) {
+                $product_promo = $product_instance->getPrice(true, null, 2);
+            } else {
+                $product_promo = 0;
+            }
             $product_stock = ($product_instance->available_now == 'In stock' ? 1 : 0);
         } else {
             $product_price = $product_instance->getPrice(true, null, 2, null, false, false);
-            $product_promo = ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2) ? $product_instance->getPrice(true, null, 2) : 0);
+            if ($product_instance->getPrice(true, null, 2, null, false, false) > $product_instance->getPrice(true, null, 2)) {
+                $product_promo = $product_instance->getPrice(true, null, 2)
+            } else {
+                $product_promo = 0;
+            }
 
             $product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
         }
-
-        // echo '
-        // <product>
-        // 	<id>'.$product_fields['id_product'].'</id>
-        // 	<inventory>
-        // 		<variations>0</variations>
-        // 		<stock>'.$product_stock.'</stock>
-        // 	</inventory>
-        // 	<price>'.$product_price.'</price>
-        // 	<promo>'.$product_promo.'</promo>
-        // 	<url>'.$product_instance->getLink().'</url>
-        // 	<image>'.$product_image.'</image>
-        // </product>';
 
         echo '
 		<product>
