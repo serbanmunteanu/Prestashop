@@ -52,8 +52,7 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
             }
         } else {
             $product_image = $link_instance->getImageLink(
-                $product_instance->link_rewrite,
-                $product_fields['id_product'], ImageType::getFormatedName('large'));
+                $product_instance->link_rewrite, $product_fields['id_product'], ImageType::getFormatedName('large'));
         }
 
         if (_PS_VERSION_ >= '1.5') {
@@ -88,5 +87,4 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
     }
 }
 
-echo '
-</products>';
+echo '</products>';
