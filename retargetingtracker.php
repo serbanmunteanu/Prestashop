@@ -1055,7 +1055,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignAddToWishlist() {
+    protected function _assignAddToWishlist()
+    {
         $js_code = 'if (typeof WishlistCart !== "undefined") {
 				var _ra_WishlistCart = WishlistCart;
 				WishlistCart = function(id, action, id_product, id_product_attribute, quantity, id_wishlist) {
@@ -1139,8 +1140,11 @@ section.init .btn-init.btn-cta {
 
     protected function _assignMouseOverAddToCart()
     {
-        if (method_exists($this->context->controller, 'getProduct')) $product_instance = $this->context->controller->getProduct(); else
+        if (method_exists($this->context->controller, 'getProduct')) {
+            $product_instance = $this->context->controller->getProduct();
+        } else {
             $product_instance = new Product((int)Tools::getValue('id_product'), $this->context->language->id);
+        }
 
         if (Validate::isLoadedObject($product_instance)) {
             $product_fields = $product_instance->getFields();
@@ -1169,7 +1173,8 @@ section.init .btn-init.btn-cta {
         return $js_code;
     }
 
-    protected function _assignVisitHelpPage() {
+    protected function _assignVisitHelpPage()
+    {
         $str_visitHelpPage = Configuration::get('ra_opt_visitHelpPage');
         $arr_visitHelpPage = explode('|', $str_visitHelpPage);
 
@@ -1198,7 +1203,9 @@ section.init .btn-init.btn-cta {
         $cartProducts = $cart_instance->getProducts();
 
         $arr_cartProducts = array();
-        foreach ($cartProducts as $product) $arr_cartProducts[] = $product['id_product'];
+        foreach ($cartProducts as $product) {
+            $arr_cartProducts[] = $product['id_product'];
+        }
 
         $js_cartProducts = '[' . implode(', ', $arr_cartProducts) . ']';
 
