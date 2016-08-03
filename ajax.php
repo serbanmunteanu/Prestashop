@@ -47,7 +47,15 @@ function getThumbnailAddToCartJS($id) {
             } else {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
-                    if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false '; else if ($key == 0) $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" '; else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }'; else $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
+                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                    } else if ($key == 0) {
+                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                    } else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                    } else {
+                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                    }
                 }
             }
         }
@@ -296,12 +304,14 @@ function getSetVariationJS($id, $vid) {
 
 if (Tools::getValue('ajax') == 'true' && Tools::getValue('method')) {
     if (Tools::getValue('method') == 'getAddToCartJS' && Tools::getValue('pid') && Tools::getValue('type')) {
-        if (Tools::getValue('type') == 'product' && Tools::getValue('vid')) die(getProductAddToCartJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
+        if (Tools::getValue('type') == 'product' && Tools::getValue('vid')) {
+            die(getProductAddToCartJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
+        }
         die(getThumbnailAddToCartJS((int)Tools::getValue('pid')));
     } else if (Tools::getValue('method') == 'getSetVariationJS' && Tools::getValue('pid') && Tools::getValue('vid')) {
         die(getSetVariationJS((int)Tools::getValue('pid'), (int)Tools::getValue('vid')));
     } else if (Tools::getValue('method') == '')
-
         die('ERROR : No valid method selected.');
-} else die('ERROR : Invalid parametres.');
-
+} else {
+    die('ERROR : Invalid parametres.');
+}

@@ -50,7 +50,9 @@ if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !i
 
         $array = array();
         $languages = Language::getLanguages();
-        foreach ($languages as $key => $language) $array[$language['id_lang']] = $cart_rule_name;
+        foreach ($languages as $key => $language) {
+            $array[$language['id_lang']] = $cart_rule_name;
+        }
 
         $cart_rule->name = $array;
         $cart_rule->description = 'Cart rule created by Retargeting: RA-' . $type . '-' . $value . '-' . $cart_rule_code;
