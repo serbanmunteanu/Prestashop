@@ -23,79 +23,66 @@
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-include(dirname(__FILE__).'/../../config/config.inc.php');
-include(dirname(__FILE__).'/../../init.php');
+include(dirname(__FILE__) . '/../../config/config.inc.php');
+include(dirname(__FILE__) . '/../../init.php');
 
 // $ra_domain_api_key = Configuration::get('ra_apikey'); 
-$ra_token = Configuration::get('ra_token'); 
+$ra_token = Configuration::get('ra_token');
 
 $key = Tools::getValue('key');
 $type = Tools::getValue('type');
 $value = Tools::getValue('value');
 $count = Tools::getValue('count');
 
-if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !is_bool($count))
-{
-	$generatedCodes = array();
+if ($key != '' && $key == $ra_token && !is_bool($type) && !is_bool($value) && !is_bool($count)) {
+    $generatedCodes = array();
 
-	for ($i = $count; $i > 0; $i --)
-	{
+    for ($i = $count; $i > 0; $i--) {
 
-		$cart_rule = new CartRuleCore();
-		
-		$cart_rule_code = '';
-		while ($cart_rule_code == '' || CartRuleCore::getIdByCode($cart_rule_code)) $cart_rule_code = Tools::strtoupper(Tools::passwdGen(8));
+        $cart_rule = new CartRuleCore();
 
-		$cart_rule_name = 'RA-' . $type . '-' . $value . '-' . $cart_rule_code;
-		
-		$array = array();
-		$languages = Language::getLanguages(); 
-		foreach ($languages as $key => $language) $array[$language['id_lang']] = $cart_rule_name;
-		
-		$cart_rule->name = $array;
-		$cart_rule->description = 'Cart rule created by Retargeting: RA-' . $type . '-' . $value . '-' . $cart_rule_code;
-		$cart_rule->code = $cart_rule_code;   
-		$cart_rule->active = 1;
-		$cart_rule->date_from = date('Y-m-d h:i:s');
-		$cart_rule->date_to = date('Y-m-d h:i:s', mktime(0, 0, 0, date('m'), date('d'), date('Y') + 1));
-		$cart_rule->quantity = 1;
-		$cart_rule->quantity_per_user = 1;
-		$cart_rule->partial_use = false;
-		
-		if ($type == 0) 
-		{
-			$cart_rule->reduction_amount = $value;
-		} 
-		else if ($type == 1) 
-		{
-			$cart_rule->reduction_percent = $value;
-		} 
-		else if ($type == 2) 
-		{
-			$cart_rule->free_shipping = true;
-		}
-		else 
-		{
-			echo Tools::jsonEncode(array(
-				'status' => false,
-				'error' => '0003: Invalid Parameters!'
-			));
-			return false;
-		}
+        $cart_rule_code = '';
+        while ($cart_rule_code == '' || CartRuleCore::getIdByCode($cart_rule_code)) {
+            $cart_rule_code = Tools::strtoupper(Tools::passwdGen(8));
+        }
 
-		$cart_rule->add();
+        $cart_rule_name = 'RA-' . $type . '-' . $value . '-' . $cart_rule_code;
 
-		$generatedCodes[] = $cart_rule->code;
-	}
+        $array = array();
+        $languages = Language::getLanguages();
+        foreach ($languages as $key => $language) {
+            $array[$language['id_lang']] = $cart_rule_name;
+        }
 
-	echo Tools::jsonEncode($generatedCodes);
-	return true;
-}
-else
-{
-	echo Tools::jsonEncode(array(
-		'status' => false,
-		'error' => '0002: Invalid Parameters!'
-	));
-	return false;
+        $cart_rule->name = $array;
+        $cart_rule->description = 'Cart rule created by Retargeting: RA-'.$type.'-'.$value.'-'.$cart_rule_code;
+        $cart_rule->code = $cart_rule_code;
+        $cart_rule->active = 1;
+        $cart_rule->date_from = date('Y-m-d h:i:s');
+        $cart_rule->date_to = date('Y-m-d h:i:s', mktime(0, 0, 0, date('m'), date('d'), date('Y') + 1));
+        $cart_rule->quantity = 1;
+        $cart_rule->quantity_per_user = 1;
+        $cart_rule->partial_use = false;
+
+        if ($type == 0) {
+            $cart_rule->reduction_amount = $value;
+        } elseif ($type == 1) {
+            $cart_rule->reduction_percent = $value;
+        } elseif ($type == 2) {
+            $cart_rule->free_shipping = true;
+        } else {
+            echo Tools::jsonEncode(array('status' => false, 'error' => '0003: Invalid Parameters!'));
+            return false;
+        }
+
+        $cart_rule->add();
+
+        $generatedCodes[] = $cart_rule->code;
+    }
+
+    echo Tools::jsonEncode($generatedCodes);
+    return true;
+} else {
+    echo Tools::jsonEncode(array('status' => false, 'error' => '0002: Invalid Parameters!'));
+    return false;
 }
