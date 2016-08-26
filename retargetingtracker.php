@@ -35,7 +35,7 @@ class RetargetingTracker extends Module
     {
         $this->name = 'retargetingtracker';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Retargeting Team';
         $this->module_key = '07f632866f76537ce3f8f01eedad4f00';
         $this->need_instance = 0;
@@ -50,7 +50,7 @@ class RetargetingTracker extends Module
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         if (!Configuration::get('ra_apikey') || Configuration::get('ra_apikey') == '') {
-            $this->warning = $this->l('No Domain API Key provided');
+            $this->warning = $this->l('No Tracking API Key provided');
         }
 
         /* Backward compatibility */
@@ -196,97 +196,97 @@ class RetargetingTracker extends Module
 
         // Basic Settings
         $form .= '
-			<section class="init">
+            <section class="init">
 
-				<input type="hidden" name="ra_init" value="1">
+                <input type="hidden" name="ra_init" value="1">
 
-				<article>
-					<!--<img src="imgs/logo-big.jpg">-->
-					<h1>Hello!</h1>
-					<h2>To have access to our awesome features you need a <a href="https://retargeting.biz" target="_blank">Retargeting account</a>.</h2>
-					<div class="ra_row">
-						<button type="submit" value="1" id="configuration_form_submit_btn" name="submitDisableInit" class="btn-init btn-disableInit">I already have an account</button>
-						<a href="https://retargeting.biz/signup" target="_blank"><div class="btn-init btn-cta">Start your 14-day Free Trial</div></a>
-					</div>
-				</article>
-			
-			</section>
+                <article>
+                    <!--<img src="imgs/logo-big.jpg">-->
+                    <h1>Hello!</h1>
+                    <h2>To have access to our awesome features you need a <a href="https://retargeting.biz" target="_blank">Retargeting account</a>.</h2>
+                    <div class="ra_row">
+                        <button type="submit" value="1" id="configuration_form_submit_btn" name="submitDisableInit" class="btn-init btn-disableInit">I already have an account</button>
+                        <a href="https://retargeting.biz/signup" target="_blank"><div class="btn-init btn-cta">Start your 14-day Free Trial</div></a>
+                    </div>
+                </article>
+            
+            </section>
 
 <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,900,300italic" rel="stylesheet" type="text/css">
 
 <style>
 section.init {
-	position: relative;
-	width: 100%;
+    position: relative;
+    width: 100%;
     height: 400px;
-	top: 0;
-	left: 0;
+    top: 0;
+    left: 0;
 }
 section.init a, section.init a:hover {
-	color: #48494F;
-	font-weight: bold;
-	text-decoration: none;
+    color: #48494F;
+    font-weight: bold;
+    text-decoration: none;
 }
 section.init article {
-	position: absolute;
-	max-width: 500px;
-	height: 329px;
-	padding: 0;
-	background-color: white;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: auto;
+    position: absolute;
+    max-width: 500px;
+    height: 329px;
+    padding: 0;
+    background-color: white;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 section.init img {
-	margin: 0 auto;
-	display: block;
+    margin: 0 auto;
+    display: block;
 }
 section.init h1 {
-	font-family: "Lato", sans-serif;
-	font-size: 50px;
-	font-weight: 900;
-	margin: 80px 0 0 0;
-	color: #48494F;
-	text-align: center;
+    font-family: "Lato", sans-serif;
+    font-size: 50px;
+    font-weight: 900;
+    margin: 80px 0 0 0;
+    color: #48494F;
+    text-align: center;
 }
 section.init h2 {
-	font-family: "Lato", sans-serif;
-	font-size: 20px;
-	font-weight: 300;
-	color: #48494F;
-	text-align: center;
+    font-family: "Lato", sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: #48494F;
+    text-align: center;
     line-height: 1.5em;
 }
 section.init .ra_row {
-	position: relative;
-	display: block;
-	width: 100%;
-	margin-top: 70px;
-	overflow: auto;
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: 70px;
+    overflow: auto;
 }
 section.init .btn-init {
-	position: relative;
-	display: block;
-	width: 50%;
-	padding: 15px 0px;
-	border: none;
-	color: #48494F;
-	font-weight: bold;
-	background-color: whitesmoke;
-	float: left;
-	cursor: pointer;
-	margin: 0px;
-	text-align: center;
+    position: relative;
+    display: block;
+    width: 50%;
+    padding: 15px 0px;
+    border: none;
+    color: #48494F;
+    font-weight: bold;
+    background-color: whitesmoke;
+    float: left;
+    cursor: pointer;
+    margin: 0px;
+    text-align: center;
 }
 section.init .btn-init.btn-cta {
-	background-color: #F11A22;
-	border-color: #F11A22;
-	color: white;
+    background-color: #F11A22;
+    border-color: #F11A22;
+    color: white;
 }
 </style>
-		';
+        ';
 
         // Form Tags
         $form .= '</form>';
@@ -302,7 +302,34 @@ section.init .btn-init.btn-cta {
         // Init Fields form array
         $fields_form = array();
 
-        $fields_form[0]['form'] = array('legend' => array('title' => $this->l('Basic Settings'),), 'input' => array(array('type' => 'text', 'label' => $this->l('Domain API Key'), 'name' => 'ra_apikey', 'desc' => 'You can find your Secure Domain API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account.'), array('type' => 'text', 'label' => $this->l('Token'), 'name' => 'ra_token', 'desc' => 'You can find your Secure Token in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'), array('type' => 'text', 'label' => $this->l('Media Server'), 'name' => 'ra_mediaServerProtocol', 'desc' => $this->l('If you\'re using media server, you\'ll have to set the http protocol for it so Retargeting can get the real image paths')),), 'submit' => array('name' => 'submitBasicSettings', 'title' => $this->l('Save')));
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $this->l('Basic Settings'),
+                ), 
+            'input' => array(
+                array(
+                    'type' => 'text', 
+                    'label' => $this->l('Tracking API Key'), 
+                    'name' => 'ra_apikey', 
+                    'desc' => 'You can find your Secure Tracking API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account.'
+                    ), 
+                array(
+                    'type' => 'text', 
+                    'label' => $this->l('REST API Key'), 
+                    'name' => 'ra_token', 
+                    'desc' => 'You can find your Secure REST API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
+                    ), 
+                array(
+                    'type' => 'text', 
+                    'label' => $this->l('Media Server'), 
+                    'name' => 'ra_mediaServerProtocol', 
+                    'desc' => $this->l('If you\'re using media server, you\'ll have to set the http protocol for it so Retargeting can get the real image paths')),
+                ), 
+            'submit' => array(
+                'name' => 'submitBasicSettings', 
+                'title' => $this->l('Save')
+                )
+            );
 
         $fields_form[1]['form'] = array('legend' => array('title' => $this->l('Specific URLs'),), 'input' => array(array('type' => 'text', 'label' => $this->l('Product Feed URL'), 'name' => 'ra_productFeedUrl', 'desc' => '', 'disabled' => 'disabled'), array('type' => 'text', 'label' => $this->l('Discounts API URL'), 'name' => 'ra_discountApiUrl', 'desc' => '', 'disabled' => 'disabled'),),);
 
@@ -359,56 +386,56 @@ section.init .btn-init.btn-cta {
 
         // Basic Settings
         $form .= '
-		    <input type="hidden" name="submitretargetingtracker" value="1">
-		    <fieldset>
+            <input type="hidden" name="submitretargetingtracker" value="1">
+            <fieldset>
 
-		        <legend> Basic Settings </legend>
+                <legend> Basic Settings </legend>
                 
-                <label> Domain API Key </label>
+                <label> Tracking API Key </label>
                 <div class="margin-form">
                     <input type="text" name="ra_apikey" id="ra_apikey" value="' . Tools::getValue('ra_apikey', Configuration::get('ra_apikey')) . '" class="">
-                    <p class="clear"> You can find your Secure Domain API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account. </p>
+                    <p class="clear"> You can find your Secure Domain Tracking Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account. </p>
                 </div>
            
-                <label> Discounts API Key </label>
+                <label> REST API Key </label>
                 <div class="margin-form">
                     <input type="text" name="ra_token" id="ra_token" value="' . Tools::getValue('ra_token', Configuration::get('ra_token')) . '" class="">
-                    <p class="clear"> You can find your Secure Discount API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account. </p>
+                    <p class="clear"> You can find your Secure REST API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&amp;token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account. </p>
                 </div>
-		        
-		        <center>
-		            <button type="submit" value="1" id="configuration_form_submit_btn" name="submitBasicSettings" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
-		        </center>
+                
+                <center>
+                    <button type="submit" value="1" id="configuration_form_submit_btn" name="submitBasicSettings" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
+                </center>
 
-		    </fieldset>';
+            </fieldset>';
 
         // Specific URLs
         $form .= '
-		    <fieldset>
+            <fieldset>
 
-		        <legend> Specific URLs </legend>
+                <legend> Specific URLs </legend>
 
                 <label> Product Feed URL </label>
                 <div class="margin-form">
                     <input type="text" name="ra_productFeedUrl" id="ra_productFeedUrl" value="' . (Configuration::get('ra_productFeedUrl') != '' ? Configuration::get('ra_productFeedUrl') : '/modules/retargetingtracker/productFeed.php') . '" class="" disabled="disabled">
-            	</div>
+                </div>
 
                 <label> Discounts API URL </label>
                 <div class="margin-form">
                     <input type="text" name="ra_discountApiUrl" id="ra_discountApiUrl" value="' . (Configuration::get('ra_discountApiUrl') != '' ? Configuration::get('ra_discountApiUrl') : '/modules/retargetingtracker/discountsApi.php?params') . '" class="" disabled="disabled">
-            	</div>
+                </div>
 
-		    </fieldset>
-		    ';
+            </fieldset>
+            ';
 
         // Tracker Options
         $form .= '
-		    <fieldset>
+            <fieldset>
 
-		        <legend> Tracker Options </legend>
-		        
-				<label> Help Pages </label>
-				<div class="margin-form">';
+                <legend> Tracker Options </legend>
+                
+                <label> Help Pages </label>
+                <div class="margin-form">';
 
         $options_visitHelpPages = explode('|', Configuration::get('ra_opt_visitHelpPage'));
         $helpPagesChecked = array();
@@ -418,58 +445,58 @@ section.init .btn-init.btn-cta {
 
         foreach (CMS::listCMS() as $page) {
             $form .= '
-			<div>
-					<input type="checkbox" name="ra_opt_visitHelpPage_' . $page['id_cms'] . '" id="ra_opt_visitHelpPage_' . $page['id_cms'] . '" class="" ' . (!empty($helpPagesChecked['ra_opt_visitHelpPage_' . $page['id_cms']]) ? 'checked="checked"' : 'notchecked') . '>
-					<label class="t" for="ra_opt_visitHelpPage_' . $page['id_cms'] . '">' . $page['meta_title'] . '</label>
-			</div>
-			';
+            <div>
+                    <input type="checkbox" name="ra_opt_visitHelpPage_' . $page['id_cms'] . '" id="ra_opt_visitHelpPage_' . $page['id_cms'] . '" class="" ' . (!empty($helpPagesChecked['ra_opt_visitHelpPage_' . $page['id_cms']]) ? 'checked="checked"' : 'notchecked') . '>
+                    <label class="t" for="ra_opt_visitHelpPage_' . $page['id_cms'] . '">' . $page['meta_title'] . '</label>
+            </div>
+            ';
         }
 
         $form .= '
-					<p class="clear"> Choose the pages on which the "visitHelpPage" event should fire. </p>
-				</div>
+                    <p class="clear"> Choose the pages on which the "visitHelpPage" event should fire. </p>
+                </div>
 
-				<label> Add To Cart Button </label>
+                <label> Add To Cart Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_addToCart" id="ra_qs_addToCart" value="' . Tools::getValue('ra_qs_addToCart', Configuration::get('ra_qs_addToCart')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the button used to add a product to cart. </p>
                 </div>
-				<label> Product Variants Buttons </label>
+                <label> Product Variants Buttons </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_variation" id="ra_qs_variation" value="' . Tools::getValue('ra_qs_variation', Configuration::get('ra_qs_variation')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the product options used to change the preferences of the product. </p>
                 </div>
-				<label> Add To Wishlist Button </label>
+                <label> Add To Wishlist Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_addToWishlist" id="ra_qs_addToWishlist" value="' . Tools::getValue('ra_qs_addToWishlist', Configuration::get('ra_qs_addToWishlist')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the button used to add a product to wishlist. </p>
                 </div>
-				<label> Product Images </label>
+                <label> Product Images </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_productImages" id="ra_qs_productImages" value="' . Tools::getValue('ra_qs_productImages', Configuration::get('ra_qs_productImages')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the main product image on a product page. </p>
                 </div>
-				<label> Submit Review Button </label>
+                <label> Submit Review Button </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_review" id="ra_qs_review" value="' . Tools::getValue('ra_qs_review', Configuration::get('ra_qs_review')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the button used to submit a comment/review for a product. </p>
                 </div>
-				<label> Price </label>
+                <label> Price </label>
                 <div class="margin-form">
                     <input type="text" name="ra_qs_price" id="ra_qs_price" value="' . Tools::getValue('ra_qs_price', Configuration::get('ra_qs_price')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the main product price on a product page. </p>
                 </div>
-				<label> Old Price </label>
+                <label> Old Price </label>
                 <div class="margin-form">
                     <input type="text" name="ra_oqs_ldPrice" id="ra_qs_oldPrice" value="' . Tools::getValue('ra_qs_oldPrice', Configuration::get('ra_qs_oldPrice')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the main product price without discount on a product page. </p>
                 </div>
-				
-		        <center>
-		            <button type="submit" value="1" id="configuration_form_submit_btn_2" name="submitTrackerOptions" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
-		        </center>
+                
+                <center>
+                    <button type="submit" value="1" id="configuration_form_submit_btn_2" name="submitTrackerOptions" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
+                </center>
 
-		    </fieldset>';
+            </fieldset>';
 
         // Form Tags
         $form .= '</form>';
@@ -622,15 +649,15 @@ section.init .btn-init.btn-cta {
         $customer = $this->context->customer;
 
         $js_code = 'var _ra = _ra || {};
-			_ra.setEmailInfo = {
-				"email": "' . $customer->email . '",
-				"name": "' . $customer->firstname . ' ' . $customer->lastname . '"
-			};
-			
-			if (_ra.ready !== undefined) {
-				_ra.setEmail(_ra.setEmailInfo)
-			}
-		';
+            _ra.setEmailInfo = {
+                "email": "' . $customer->email . '",
+                "name": "' . $customer->firstname . ' ' . $customer->lastname . '"
+            };
+            
+            if (_ra.ready !== undefined) {
+                _ra.setEmail(_ra.setEmailInfo)
+            }
+        ';
 
         $this->context->cookie->ra_setEmail = serialize(urlencode($js_code));
     }
@@ -674,29 +701,29 @@ section.init .btn-init.btn-cta {
                 $discountsCode = implode(', ', $discountsCode);
             }
 
-            $js_code .= 'var _ra = _ra || {};	
-				_ra.saveOrderInfo = {
-					"order_no": ' . $order->id . ',
-					"lastname": "' . $address->lastname . '",
-					"firstname": "' . $address->firstname . '",
-					"email": "' . $customer->email . '",
-					"phone": "' . ($address->phone == '' ? $address->phone : $address->phone_mobile) . '",
-					"state": "' . (isset($address->id_state) ? State::getNameById($address->id_state) : '') . '",
-					"city": "' . $address->city . '",
-					"address": "' . $address->address1 . '",
-					"discount": ' . $order->total_discounts . ',
-					"discount_code": "' . $discountsCode . '",
-					"shipping": ' . $order->total_shipping . ',
-					"rebates": 0,
-					"fees": 0,
-					"total": ' . $order->total_paid . '
-				};
-				_ra.saveOrderProducts = ' . $orderProducts . ';
+            $js_code .= 'var _ra = _ra || {};   
+                _ra.saveOrderInfo = {
+                    "order_no": ' . $order->id . ',
+                    "lastname": "' . $address->lastname . '",
+                    "firstname": "' . $address->firstname . '",
+                    "email": "' . $customer->email . '",
+                    "phone": "' . ($address->phone == '' ? $address->phone : $address->phone_mobile) . '",
+                    "state": "' . (isset($address->id_state) ? State::getNameById($address->id_state) : '') . '",
+                    "city": "' . $address->city . '",
+                    "address": "' . $address->address1 . '",
+                    "discount": ' . $order->total_discounts . ',
+                    "discount_code": "' . $discountsCode . '",
+                    "shipping": ' . $order->total_shipping . ',
+                    "rebates": 0,
+                    "fees": 0,
+                    "total": ' . $order->total_paid . '
+                };
+                _ra.saveOrderProducts = ' . $orderProducts . ';
 
-				if( _ra.ready !== undefined ){
-					_ra.saveOrder(_ra.saveOrderInfo, _ra.saveOrderProducts);
-				}
-			';
+                if( _ra.ready !== undefined ){
+                    _ra.saveOrder(_ra.saveOrderInfo, _ra.saveOrderProducts);
+                }
+            ';
 
             $paramsAPI['orderInfo'] = array(
                 'order_no' => $order->id,
@@ -755,18 +782,18 @@ section.init .btn-init.btn-cta {
 
         if ($ra_domain_api_key && $ra_domain_api_key != '') {
             $js_embedd = '
-				(function(){
-				ra_key = "' . $ra_domain_api_key . '";
-				ra_params = {
-					add_to_cart_button_id: "' . $ra_addToCart . '",
-					price_label_id: "' . $ra_price . '",
-				};
-				var ra = document.createElement("script"); ra.type ="text/javascript"; ra.async = true; ra.src = ("https:" ==
-				document.location.protocol ? "https://" : "http://") + "tracking.retargeting.biz/v3/rajs/" + ra_key + ".js";
-				var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ra,s);})();
-			';
+                (function(){
+                ra_key = "' . $ra_domain_api_key . '";
+                ra_params = {
+                    add_to_cart_button_id: "' . $ra_addToCart . '",
+                    price_label_id: "' . $ra_price . '",
+                };
+                var ra = document.createElement("script"); ra.type ="text/javascript"; ra.async = true; ra.src = ("https:" ==
+                document.location.protocol ? "https://" : "http://") + "tracking.retargeting.biz/v3/rajs/" + ra_key + ".js";
+                var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ra,s);})();
+            ';
         } else {
-            $js_embedd = 'console.info("Retargeting Tracker: please set the Domain API Key.");';
+            $js_embedd = 'console.info("Retargeting Tracker: please set the Tracking API Key.");';
         }
 
         return $js_embedd;
@@ -818,14 +845,14 @@ section.init .btn-init.btn-cta {
         $js_categoryBreadcrumb = '[' . implode(', ', $arr_categoryBreadcrumb) . ']';
 
         $js_code = 'var _ra = _ra || {};
-			_ra.sendCategoryInfo = { ' . $js_category . ',
-				"breadcrumb": ' . $js_categoryBreadcrumb . '
-			};
-			
-			if (_ra.ready !== undefined) {
-				_ra.sendCategory(_ra.sendCategoryInfo);
-			}
-		';
+            _ra.sendCategoryInfo = { ' . $js_category . ',
+                "breadcrumb": ' . $js_categoryBreadcrumb . '
+            };
+            
+            if (_ra.ready !== undefined) {
+                _ra.sendCategory(_ra.sendCategoryInfo);
+            }
+        ';
 
         return $js_code;
     }
@@ -842,15 +869,15 @@ section.init .btn-init.btn-cta {
 
         if (Validate::isLoadedObject($brand_instance)) {
             $js_code .= 'var _ra = _ra || {};
-				_ra.sendBrandInfo = {
-					"id": "' . $brand_instance->id_manufacturer . '",
-					"name": "' . $brand_instance->name . '"
-				};
-				
-				if (_ra.ready !== undefined) {
-					_ra.sendBrand(_ra.sendBrandInfo);
-				}
-			';
+                _ra.sendBrandInfo = {
+                    "id": "' . $brand_instance->id_manufacturer . '",
+                    "name": "' . $brand_instance->name . '"
+                };
+                
+                if (_ra.ready !== undefined) {
+                    _ra.sendBrand(_ra.sendBrandInfo);
+                }
+            ';
         }
 
         return $js_code;
@@ -917,7 +944,7 @@ section.init .btn-init.btn-cta {
                 $imgDomain = Configuration::get('ra_mediaServerProtocol') . _MEDIA_SERVER_3_;
             }
 
-            //			$product_image = '';
+            //          $product_image = '';
             $id_image = Product::getCover($product_fields['id_product']);
             if (sizeof($id_image) > 0) {
                 $image = new Image($id_image['id_image']);
@@ -957,25 +984,25 @@ section.init .btn-init.btn-cta {
             }
 
             $js_code = 'var _ra = _ra || {};
-				_ra.sendProductInfo = {
-					"id": "' . $product_fields['id_product'] . '",
-					"name": "' . (is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name) . '",
-					"url": "' . $product_instance->getLink() . '", 
-				  	"img": "' . $raImg . '", 
-				  	"price": ' . $product_price . ',
-					"promo": ' . $product_promo . ',
-					"brand": ' . ($product_instance->manufacturer_name != '' ? '"' . $product_instance->manufacturer_name . '"' : 'false') . ',
-					"category": ' . $js_category . ',
-					"inventory": {
-						"variations": false,
-						"stock": ' . $product_stock . '
-					}
-				};
-				
-				if (_ra.ready !== undefined) {
-					_ra.sendProduct(_ra.sendProductInfo);
-				}
-			';
+                _ra.sendProductInfo = {
+                    "id": "' . $product_fields['id_product'] . '",
+                    "name": "' . (is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name) . '",
+                    "url": "' . $product_instance->getLink() . '", 
+                    "img": "' . $raImg . '", 
+                    "price": ' . $product_price . ',
+                    "promo": ' . $product_promo . ',
+                    "brand": ' . ($product_instance->manufacturer_name != '' ? '"' . $product_instance->manufacturer_name . '"' : 'false') . ',
+                    "category": ' . $js_category . ',
+                    "inventory": {
+                        "variations": false,
+                        "stock": ' . $product_stock . '
+                    }
+                };
+                
+                if (_ra.ready !== undefined) {
+                    _ra.sendProduct(_ra.sendProductInfo);
+                }
+            ';
         }
 
         return $js_code;
@@ -984,45 +1011,45 @@ section.init .btn-init.btn-cta {
     protected function _assignAddToCart($controller)
     {
         $js_code = '
-			if (typeof ajaxCart !== "undefined") {
-				var _ra_ajaxCart_add = ajaxCart.add;
-				ajaxCart.add = function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist) {
-	
-					$.ajax({
-						url: baseDir + "modules/retargetingtracker/ajax.php",
-						type: "GET",
-						data: "ajax=true&method=getAddToCartJS&type=' . $controller . '&pid=" + idProduct + "&vid=" + idCombination,
-						success: function(data) {
-							var s = document.createElement("script");
-							s.type = "text/javascript";
-							s.text = data;
-							$("head").append(s);
-						}
-					});
-		
-					return _ra_ajaxCart_add(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist);
-				}
-			}
-			
-			// #buy_block compatability
-			if ($("#buy_block").length) {
-				$("#buy_block").submit(function() {
-					var $pid = $("#buy_block input[name=\'id_product\']");
-					if (typeof _ra.addToCart === "function" && $pid.length) {
-						_ra.addToCart($pid.val(), 1, false);
-					}
-				});	
-			}
-			if ($(".ajax_add_to_cart_button").length) {
-				$(".ajax_add_to_cart_button").click(function() {
-					var pid = $(this).data("id-product");
-					if (typeof _ra.addToCart === "function" && pid) {
-						_ra.addToCart(pid, 1, false);
-					}
-				});
-			}
-			
-		';
+            if (typeof ajaxCart !== "undefined") {
+                var _ra_ajaxCart_add = ajaxCart.add;
+                ajaxCart.add = function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist) {
+    
+                    $.ajax({
+                        url: baseDir + "modules/retargetingtracker/ajax.php",
+                        type: "GET",
+                        data: "ajax=true&method=getAddToCartJS&type=' . $controller . '&pid=" + idProduct + "&vid=" + idCombination,
+                        success: function(data) {
+                            var s = document.createElement("script");
+                            s.type = "text/javascript";
+                            s.text = data;
+                            $("head").append(s);
+                        }
+                    });
+        
+                    return _ra_ajaxCart_add(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist);
+                }
+            }
+            
+            // #buy_block compatability
+            if ($("#buy_block").length) {
+                $("#buy_block").submit(function() {
+                    var $pid = $("#buy_block input[name=\'id_product\']");
+                    if (typeof _ra.addToCart === "function" && $pid.length) {
+                        _ra.addToCart($pid.val(), 1, false);
+                    }
+                }); 
+            }
+            if ($(".ajax_add_to_cart_button").length) {
+                $(".ajax_add_to_cart_button").click(function() {
+                    var pid = $(this).data("id-product");
+                    if (typeof _ra.addToCart === "function" && pid) {
+                        _ra.addToCart(pid, 1, false);
+                    }
+                });
+            }
+            
+        ';
 
         return $js_code;
     }
@@ -1030,27 +1057,27 @@ section.init .btn-init.btn-cta {
     protected function _assignSetVariation()
     {
         $js_code = 'function _ra_setVariation() {
-				var pid = $("#product_page_product_id").val(),
-					vid = $("#idCombination").val();
-				if (pid !== null && vid > 0) {
-					$.ajax({
-						url: baseDir + "modules/retargetingtracker/ajax.php",
-						type: "GET",
-						data: "ajax=true&method=getSetVariationJS&pid=" + pid + "&vid=" + vid,
-						success: function(data) {
-							var s = document.createElement("script");
-							s.type = "text/javascript";
-							s.text = data;
-							$("head").append(s);
-						}
-					});
-				}
-			}
-			
-			$(".color_pick").click(_ra_setVariation);
-			$("#attributes select").change(_ra_setVariation);
-			$("#attributes radio").click(_ra_setVariation);
-		';
+                var pid = $("#product_page_product_id").val(),
+                    vid = $("#idCombination").val();
+                if (pid !== null && vid > 0) {
+                    $.ajax({
+                        url: baseDir + "modules/retargetingtracker/ajax.php",
+                        type: "GET",
+                        data: "ajax=true&method=getSetVariationJS&pid=" + pid + "&vid=" + vid,
+                        success: function(data) {
+                            var s = document.createElement("script");
+                            s.type = "text/javascript";
+                            s.text = data;
+                            $("head").append(s);
+                        }
+                    });
+                }
+            }
+            
+            $(".color_pick").click(_ra_setVariation);
+            $("#attributes select").change(_ra_setVariation);
+            $("#attributes radio").click(_ra_setVariation);
+        ';
 
         return $js_code;
     }
@@ -1058,13 +1085,13 @@ section.init .btn-init.btn-cta {
     protected function _assignAddToWishlist()
     {
         $js_code = 'if (typeof WishlistCart !== "undefined") {
-				var _ra_WishlistCart = WishlistCart;
-				WishlistCart = function(id, action, id_product, id_product_attribute, quantity, id_wishlist) {
-					_ra.addToWishlist(id_product);
-					return _ra_WishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
-				}
-			}
-		';
+                var _ra_WishlistCart = WishlistCart;
+                WishlistCart = function(id, action, id_product, id_product_attribute, quantity, id_wishlist) {
+                    _ra.addToWishlist(id_product);
+                    return _ra_WishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
+                }
+            }
+        ';
 
         return $js_code;
     }
@@ -1074,11 +1101,11 @@ section.init .btn-init.btn-cta {
         $ra_productImages = (Configuration::get('ra_qs_productImages') != '' ? Configuration::get('ra_qs_productImages') : '#image-block');
 
         $js_code = 'function _ra_clickImage() {
-				_ra.clickImage($("#product_page_product_id").val());
-			}
+                _ra.clickImage($("#product_page_product_id").val());
+            }
 
-			$("' . $ra_productImages . '").click(_ra_clickImage);
-		';
+            $("' . $ra_productImages . '").click(_ra_clickImage);
+        ';
 
         return $js_code;
     }
@@ -1088,11 +1115,11 @@ section.init .btn-init.btn-cta {
         $ra_review = (Configuration::get('ra_qs_review') != '' ? Configuration::get('ra_qs_review') : '#submitNewMessage');
 
         $js_code = 'function _ra_commentOnProduct() {
-				_ra.commentOnProduct($("#product_page_product_id").val());
-			}
+                _ra.commentOnProduct($("#product_page_product_id").val());
+            }
 
-			$("' . $ra_review . '").click(_ra_commentOnProduct);
-		';
+            $("' . $ra_review . '").click(_ra_commentOnProduct);
+        ';
 
         return $js_code;
     }
@@ -1124,15 +1151,15 @@ section.init .btn-init.btn-cta {
             }
 
             $js_code = 'function _ra_mouseOverPrice() {
-					if (typeof _ra.mouseOverPrice !== "function") return false;
-					_ra.mouseOverPrice("' . $product_fields['id_product'] . '", {
-						"price": ' . $product_price . ',
-						"promo": ' . $product_promo . '
-					});
-				}
+                    if (typeof _ra.mouseOverPrice !== "function") return false;
+                    _ra.mouseOverPrice("' . $product_fields['id_product'] . '", {
+                        "price": ' . $product_price . ',
+                        "promo": ' . $product_promo . '
+                    });
+                }
 
-				$("#our_price_display").mouseenter(_ra_mouseOverPrice);
-			';
+                $("#our_price_display").mouseenter(_ra_mouseOverPrice);
+            ';
         }
 
         return $js_code;
@@ -1150,12 +1177,12 @@ section.init .btn-init.btn-cta {
             $product_fields = $product_instance->getFields();
 
             $js_code = 'function _ra_mouseOverAddToCart() {
-					if (typeof _ra.mouseOverAddToCart !== "function") return false;
-					_ra.mouseOverAddToCart("' . $product_fields['id_product'] . '");
-				}
+                    if (typeof _ra.mouseOverAddToCart !== "function") return false;
+                    _ra.mouseOverAddToCart("' . $product_fields['id_product'] . '");
+                }
 
-				$("#add_to_cart [type=\'submit\']").mouseenter(_ra_mouseOverAddToCart);
-			';
+                $("#add_to_cart [type=\'submit\']").mouseenter(_ra_mouseOverAddToCart);
+            ';
         }
 
         return $js_code;
@@ -1164,11 +1191,11 @@ section.init .btn-init.btn-cta {
     protected function _assignLikeFacebook()
     {
         $js_code = 'if (typeof FB != "undefined") {
-				FB.Event.subscribe("edge.create", function () {
-					_ra.likeFacebook($("#product_page_product_id").val());
-				});
-			};
-		';
+                FB.Event.subscribe("edge.create", function () {
+                    _ra.likeFacebook($("#product_page_product_id").val());
+                });
+            };
+        ';
 
         return $js_code;
     }
@@ -1184,14 +1211,14 @@ section.init .btn-init.btn-cta {
 
         if (in_array($currentCMSPageId, $arr_visitHelpPage)) {
             $js_code .= 'var _ra = _ra || {};
-				_ra.visitHelpPageInfo = {
-					"visit" : true
-				}
-				
-				if (_ra.ready !== undefined) {
-					_ra.visitHelpPage();
-				}
-			';
+                _ra.visitHelpPageInfo = {
+                    "visit" : true
+                }
+                
+                if (_ra.ready !== undefined) {
+                    _ra.visitHelpPage();
+                }
+            ';
         }
 
         return $js_code;
@@ -1210,12 +1237,12 @@ section.init .btn-init.btn-cta {
         $js_cartProducts = '[' . implode(', ', $arr_cartProducts) . ']';
 
         $js_code = 'var _ra = _ra || {};
-			_ra.checkoutIdsInfo = ' . $js_cartProducts . ';
-			
-			if (_ra.ready !== undefined) {
-				_ra.checkoutIds(_ra.checkoutIdsInfo);
-			}
-		';
+            _ra.checkoutIdsInfo = ' . $js_cartProducts . ';
+            
+            if (_ra.ready !== undefined) {
+                _ra.checkoutIds(_ra.checkoutIdsInfo);
+            }
+        ';
 
         return $js_code;
     }
@@ -1223,14 +1250,14 @@ section.init .btn-init.btn-cta {
     protected function _assignSetCartUrl()
     {
         $js_code = ' var _ra = _ra || {};
-			_ra.setCartUrlInfo = {
-				"url": window.location.toString()
-			};
+            _ra.setCartUrlInfo = {
+                "url": window.location.toString()
+            };
 
-			if (_ra.ready !== undefined) {
-				_ra.setCartUrl(_ra.setCartUrlInfo.url);
-			}
-		';
+            if (_ra.ready !== undefined) {
+                _ra.setCartUrl(_ra.setCartUrlInfo.url);
+            }
+        ';
 
         return $js_code;
     }
@@ -1241,9 +1268,9 @@ section.init .btn-init.btn-cta {
     private function _runJs($js_code)
     {
         return '
-		<script type="text/javascript" id="ra">
-			' . $js_code . '
-		</script>';
+        <script type="text/javascript" id="ra">
+            ' . $js_code . '
+        </script>';
     }
 
     protected function getCurrentController()
