@@ -670,7 +670,7 @@ section.init .btn-init.btn-cta {
         $js_code = '';
 
         $order = $params['objOrder'];
-        $discounts = $order->getDiscounts();
+        $discounts = $order->getCartRules();
         $customer = new Customer((int)$order->id_customer);
         $address = new Address((int)$order->id_address_delivery);
 
