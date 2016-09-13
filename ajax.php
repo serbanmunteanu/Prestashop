@@ -86,22 +86,21 @@ function getThumbnailAddToCartJS($id)
                         $productAtttribute['name'] = str_replace('-', ' ', $productAtttribute['name']);
                         $arr_variationCode[] = $productAtttribute['name'];
                         $arr_variationDetails[] = '"' . $productAtttribute['name'] . '": {
-								"category_name": "' . $productAtttribute['group'] . '",
-								"category": "' . $productAtttribute['group'] . '",
-								"value": "' . $productAtttribute['name'] . '"
-							}
-							';
+					"category_name": "' . $productAtttribute['group'] . '",
+					"category": "' . $productAtttribute['group'] . '",
+					"value": "' . $productAtttribute['name'] . '"
+				}';
                     }
                     $js_variationCode = implode('-', $arr_variationCode);
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
-						"code": "' . $js_variationCode . '",
-						"stock": ' . ($product->available_now == 'In stock' ? 1 : 0) . ',
-						"details": {
-							' . $js_variationDetails . '
-						}
-					}';
-                }
+			"code": "' . $js_variationCode . '",
+			"stock": ' . ($product->available_now == 'In stock' ? 1 : 0) . ',
+			"details": {
+				' . $js_variationDetails . '
+			}
+		}';
+        }
             } else {
                 $product = new Product($id, 1);
                 $productAtttributes = $product->getAttributeCombinaisons(1);
@@ -115,9 +114,9 @@ function getThumbnailAddToCartJS($id)
                             $productAtttribute['attribute_name'] = str_replace('-', ' ', $productAtttribute['attribute_name']);
                             $arr_variationCode[] = $productAtttribute['attribute_name'];
                             $arr_variationDetails[] = '"' . $productAtttribute['attribute_name'] . '": {
-									"category_name": "' . $productAtttribute['group_name'] . '",
-									"category": "' . $productAtttribute['group_name'] . '",
-									"value": "' . $productAtttribute['attribute_name'] . '"
+				"category_name": "' . $productAtttribute['group_name'] . '",
+				"category": "' . $productAtttribute['group_name'] . '",
+				"value": "' . $productAtttribute['attribute_name'] . '"
 								}
 								';
                         }
@@ -125,12 +124,12 @@ function getThumbnailAddToCartJS($id)
                     $js_variationCode = implode('-', $arr_variationCode);
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
-						"code": "' . $js_variationCode . '",
-						"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
-						"details": {
-							' . $js_variationDetails . '
-						}
-					}';
+			"code": "' . $js_variationCode . '",
+			"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+			"details": {
+				' . $js_variationDetails . '
+			}
+		}';
                 }
             }
         }
@@ -165,23 +164,7 @@ function getThumbnailAddToCartJS($id)
             $product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
         }
 
-        $js_code = '_ra.sendProduct({
-				"id": "' . $product_fields['id_product'] . '",
-				"name": "' . (is_array($product->name) ? $product->name[1] : $product->name) . '",
-				"url": "' . $product->getLink() . '", 
-			  	"img": "' . $product_image . '", 
-			  	"price": ' . $product_price . ',
-				"promo": ' . $product_promo . ',
-				"brand": ' . ($product->manufacturer_name != '' ? '"' . $product->manufacturer_name . '"' : 'false') . ',
-				"category": ' . $js_category . ',
-				"inventory": {
-					"variations": false,
-					"stock": ' . $product_stock . '
-				}
-			}, function() {
-				_ra.addToCart("' . $product_fields['id_product'] . '", 1, ' . $js_variation . ');
-			});
-		';
+        $js_code = '_ra.addToCart("' . $product_fields['id_product'] . '", 1, ' . $js_variation . ');';
     }
 
     return $js_code;
