@@ -636,7 +636,7 @@ section.init .btn-init.btn-cta {
 
         //custom checkoutURL && checkoutIds
         if(Configuration::get('ra_checkout_url') != '') {
-            $current_url = _PS_BASE_URL_.$_SERVER['REQUEST_URI'];
+            $current_url = strtok(_PS_BASE_URL_.$_SERVER['REQUEST_URI'], '?');
             $custom_url = Configuration::get('ra_checkout_url');
 
             if($current_url == $custom_url) {
