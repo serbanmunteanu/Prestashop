@@ -67,64 +67,67 @@ class RetargetingTracker extends Module
 
         if (_PS_VERSION_ >= '1.5') {
             return parent::install() &&
-                Configuration::updateValue('ra_apikey', '') &&
-                Configuration::updateValue('ra_token', '') &&
-                Configuration::updateValue('ra_productFeedUrl', '') &&
-                Configuration::updateValue('ra_discountApiUrl', '') &&
-                Configuration::updateValue('ra_opt_visitHelpPage', '') &&
-                Configuration::updateValue('ra_mediaServerProtocol', 'http://') &&
-                Configuration::updateValue('ra_qs_addToCart', '') &&
-                Configuration::updateValue('ra_qs_variation', '') &&
-                Configuration::updateValue('ra_qs_addToWishlist', '') &&
-                Configuration::updateValue('ra_qs_productImages', '') &&
-                Configuration::updateValue('ra_qs_review', '') &&
-                Configuration::updateValue('ra_qs_price', '') &&
-                Configuration::updateValue('ra_qs_oldPrice', '') &&
-                Configuration::updateValue('ra_init', 'false') &&
-                $this->registerHook('displayHome') &&
-                $this->registerHook('displayHeader') &&
-                $this->registerHook('displayOrderConfirmation') &&
-                $this->registerHook('actionAuthentication') &&
-                $this->registerHook('actionCustomerAccountAdd');
+            Configuration::updateValue('ra_apikey', '') &&
+            Configuration::updateValue('ra_token', '') &&
+            Configuration::updateValue('ra_productFeedUrl', '') &&
+            Configuration::updateValue('ra_discountApiUrl', '') &&
+            Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+            Configuration::updateValue('ra_mediaServerProtocol', 'http://') &&
+            Configuration::updateValue('ra_qs_addToCart', '') &&
+            Configuration::updateValue('ra_qs_variation', '') &&
+            Configuration::updateValue('ra_qs_addToWishlist', '') &&
+            Configuration::updateValue('ra_qs_productImages', '') &&
+            Configuration::updateValue('ra_qs_review', '') &&
+            Configuration::updateValue('ra_qs_price', '') &&
+            Configuration::updateValue('ra_qs_oldPrice', '') &&
+            Configuration::updateValue('ra_checkout_url', '') &&
+            Configuration::updateValue('ra_init', 'false') &&
+            $this->registerHook('displayHome') &&
+            $this->registerHook('displayHeader') &&
+            $this->registerHook('displayOrderConfirmation') &&
+            $this->registerHook('actionAuthentication') &&
+            $this->registerHook('actionCustomerAccountAdd');
         } else {
             return parent::install() &&
-                Configuration::updateValue('ra_apikey', '') &&
-                Configuration::updateValue('ra_token', '') &&
-                Configuration::updateValue('ra_productFeedUrl', '') &&
-                Configuration::updateValue('ra_discountApiUrl', '') &&
-                Configuration::updateValue('ra_opt_visitHelpPage', '') &&
-                Configuration::updateValue('ra_qs_addToCart', '') &&
-                Configuration::updateValue('ra_qs_variation', '') &&
-                Configuration::updateValue('ra_qs_addToWishlist', '') &&
-                Configuration::updateValue('ra_qs_productImages', '') &&
-                Configuration::updateValue('ra_qs_review', '') &&
-                Configuration::updateValue('ra_qs_price', '') &&
-                Configuration::updateValue('ra_qs_oldPrice', '') &&
-                Configuration::updateValue('ra_init', 'false') &&
-                $this->registerHook('header') &&
-                $this->registerHook('orderConfirmation') &&
-                $this->registerHook('authentication') &&
-                $this->registerHook('createAccount');
+            Configuration::updateValue('ra_apikey', '') &&
+            Configuration::updateValue('ra_token', '') &&
+            Configuration::updateValue('ra_productFeedUrl', '') &&
+            Configuration::updateValue('ra_discountApiUrl', '') &&
+            Configuration::updateValue('ra_opt_visitHelpPage', '') &&
+            Configuration::updateValue('ra_qs_addToCart', '') &&
+            Configuration::updateValue('ra_qs_variation', '') &&
+            Configuration::updateValue('ra_qs_addToWishlist', '') &&
+            Configuration::updateValue('ra_qs_productImages', '') &&
+            Configuration::updateValue('ra_qs_review', '') &&
+            Configuration::updateValue('ra_qs_price', '') &&
+            Configuration::updateValue('ra_qs_oldPrice', '') &&
+            Configuration::updateValue('ra_checkout_url', '') &&
+            Configuration::updateValue('ra_init', 'false') &&
+            $this->registerHook('header') &&
+            $this->registerHook('orderConfirmation') &&
+            $this->registerHook('authentication') &&
+            $this->registerHook('createAccount');
         }
     }
 
     public function uninstall()
     {
         return Configuration::deleteByName('ra_apikey') &&
-            Configuration::deleteByName('ra_token') &&
-            Configuration::deleteByName('ra_productFeedUrl') &&
-            Configuration::deleteByName('ra_discountApiUrl') &&
-            Configuration::deleteByName('ra_opt_visitHelpPage') &&
-            Configuration::deleteByName('ra_mediaServerProtocol') &&
-            Configuration::deleteByName('ra_qs_addToCart', '') &&
-            Configuration::deleteByName('ra_qs_variation', '') &&
-            Configuration::deleteByName('ra_qs_addToWishlist', '') &&
-            Configuration::deleteByName('ra_qs_productImages', '') &&
-            Configuration::deleteByName('ra_qs_review', '') &&
-            Configuration::deleteByName('ra_qs_price', '') &&
-            Configuration::deleteByName('ra_qs_oldPrice', '') &&
-            Configuration::deleteByName('ra_init') &&
-            parent::uninstall();
+        Configuration::deleteByName('ra_token') &&
+        Configuration::deleteByName('ra_productFeedUrl') &&
+        Configuration::deleteByName('ra_discountApiUrl') &&
+        Configuration::deleteByName('ra_opt_visitHelpPage') &&
+        Configuration::deleteByName('ra_mediaServerProtocol') &&
+        Configuration::deleteByName('ra_qs_addToCart', '') &&
+        Configuration::deleteByName('ra_qs_variation', '') &&
+        Configuration::deleteByName('ra_qs_addToWishlist', '') &&
+        Configuration::deleteByName('ra_qs_productImages', '') &&
+        Configuration::deleteByName('ra_qs_review', '') &&
+        Configuration::deleteByName('ra_qs_price', '') &&
+        Configuration::deleteByName('ra_qs_oldPrice', '') &&
+        Configuration::deleteByName('ra_checkout_url', '') &&
+        Configuration::deleteByName('ra_init') &&
+        parent::uninstall();
     }
 
     public function getContent()
@@ -155,6 +158,7 @@ class RetargetingTracker extends Module
             $ra_review = (string)Tools::getValue('ra_qs_review');
             $ra_price = (string)Tools::getValue('ra_qs_price');
             $ra_oldPrice = (string)Tools::getValue('ra_qs_oldPrice');
+            $ra_checkout_url = (string)Tools::getValue('ra_checkout_url');
 
             foreach (CMS::listCMS() as $cmsPage) {
                 $option = (string)Tools::getValue('ra_opt_visitHelpPage_' . $cmsPage['id_cms']);
@@ -171,6 +175,7 @@ class RetargetingTracker extends Module
             Configuration::updateValue('ra_qs_review', $ra_review);
             Configuration::updateValue('ra_qs_price', $ra_price);
             Configuration::updateValue('ra_qs_oldPrice', $ra_oldPrice);
+            Configuration::updateValue('ra_checkout_url', $ra_checkout_url);
 
             $output .= $this->displayConfirmation($this->l('Settings updated! Enjoy!'));
         }
@@ -305,35 +310,104 @@ section.init .btn-init.btn-cta {
         $fields_form[0]['form'] = array(
             'legend' => array(
                 'title' => $this->l('Basic Settings'),
-                ), 
+            ),
             'input' => array(
                 array(
-                    'type' => 'text', 
-                    'label' => $this->l('Tracking API Key'), 
-                    'name' => 'ra_apikey', 
+                    'type' => 'text',
+                    'label' => $this->l('Tracking API Key'),
+                    'name' => 'ra_apikey',
                     'desc' => 'You can find your Secure Tracking API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=5ac66ac466f3e1ec5e6fe5a040356997">Retargeting</a> account.'
-                    ), 
+                ),
                 array(
-                    'type' => 'text', 
-                    'label' => $this->l('REST API Key'), 
-                    'name' => 'ra_token', 
+                    'type' => 'text',
+                    'label' => $this->l('REST API Key'),
+                    'name' => 'ra_token',
                     'desc' => 'You can find your Secure REST API Key in your <a href="https://retargeting.biz/admin?action=api_redirect&token=028e36488ab8dd68eaac58e07ef8f9bf">Retargeting</a> account.'
-                    ), 
+                ),
                 array(
-                    'type' => 'text', 
-                    'label' => $this->l('Media Server'), 
-                    'name' => 'ra_mediaServerProtocol', 
+                    'type' => 'text',
+                    'label' => $this->l('Media Server'),
+                    'name' => 'ra_mediaServerProtocol',
                     'desc' => $this->l('If you\'re using media server, you\'ll have to set the http protocol for it so Retargeting can get the real image paths')),
-                ), 
+            ),
             'submit' => array(
-                'name' => 'submitBasicSettings', 
+                'name' => 'submitBasicSettings',
                 'title' => $this->l('Save')
-                )
-            );
+            )
+        );
 
         $fields_form[1]['form'] = array('legend' => array('title' => $this->l('Specific URLs'),), 'input' => array(array('type' => 'text', 'label' => $this->l('Product Feed URL'), 'name' => 'ra_productFeedUrl', 'desc' => '', 'disabled' => 'disabled'), array('type' => 'text', 'label' => $this->l('Discounts API URL'), 'name' => 'ra_discountApiUrl', 'desc' => '', 'disabled' => 'disabled'),),);
 
-        $fields_form[2]['form'] = array('legend' => array('title' => $this->l('Tracker Options'),), 'input' => array(array('type' => 'checkbox', 'label' => $this->l('Help Pages'), 'name' => 'ra_opt_visitHelpPage', 'desc' => $this->l('Choose the pages on which the "visitHelpPage" event should fire.'), 'values' => array('query' => CMS::listCMS(), 'id' => 'id_cms', 'name' => 'meta_title')), array('type' => 'text', 'label' => $this->l('Add To Cart Button'), 'name' => 'ra_qs_addToCart', 'desc' => '[Experimental] Query selector for the button used to add a product to cart.'), array('type' => 'text', 'label' => $this->l('Product Variants Buttons'), 'name' => 'ra_qs_variation', 'desc' => '[Experimental] Query selector for the product options used to change the preferences of the product.'), array('type' => 'text', 'label' => $this->l('Add To Wishlist Button'), 'name' => 'ra_qs_addToWishlist', 'desc' => '[Experimental] Query selector for the button used to add a product to wishlist.'), array('type' => 'text', 'label' => $this->l('Product Images'), 'name' => 'ra_qs_productImages', 'desc' => '[Experimental] Query selector for the main product image on a product page.'), array('type' => 'text', 'label' => $this->l('Submit Review Button'), 'name' => 'ra_qs_review', 'desc' => '[Experimental] Query selector for the button used to submit a comment/review for a product.'), array('type' => 'text', 'label' => $this->l('Price'), 'name' => 'ra_qs_price', 'desc' => '[Experimental] Query selector for the main product price on a product page.'), array('type' => 'text', 'label' => $this->l('Old Price'), 'name' => 'ra_qs_oldPrice', 'desc' => '[Experimental] Query selector for the main product price without discount on a product page.'),), 'submit' => array('name' => 'submitTrackerOptions', 'title' => $this->l('Save')));
+        $fields_form[2]['form'] = array(
+            'legend' => array(
+                'title' => $this->l('Tracker Options'),
+                ),
+            'input' => array(
+                array(
+                    'type' => 'checkbox',
+                    'label' => $this->l('Help Pages'),
+                    'name' => 'ra_opt_visitHelpPage',
+                    'desc' => $this->l('Choose the pages on which the "visitHelpPage" event should fire.'),
+                    'values' => array(
+                        'query' => CMS::listCMS(),
+                        'id' => 'id_cms', 'name' => 'meta_title'
+                    )
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Add To Cart Button'
+                    ),
+                    'name' => 'ra_qs_addToCart',
+                    'desc' => '[Experimental] Query selector for the button used to add a product to cart.'
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Product Variants Buttons'),
+                    'name' => 'ra_qs_variation',
+                    'desc' => '[Experimental] Query selector for the product options used to change the preferences of the product.'
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Add To Wishlist Button'),
+                    'name' => 'ra_qs_addToWishlist',
+                    'desc' => '[Experimental] Query selector for the button used to add a product to wishlist.'
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Product Images'),
+                    'name' => 'ra_qs_productImages',
+                    'desc' => '[Experimental] Query selector for the main product image on a product page.'
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Submit Review Button'),
+                    'name' => 'ra_qs_review',
+                    'desc' => '[Experimental] Query selector for the button used to submit a comment/review for a product.'
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Price'),
+                    'name' => 'ra_qs_price',
+                    'desc' => '[Experimental] Query selector for the main product price on a product page.'
+                ),
+            array(
+                'type' => 'text',
+                'label' => $this->l('Old Price'),
+                'name' => 'ra_qs_oldPrice',
+                'desc' => '[Experimental] Query selector for the main product price without discount on a product page.'
+            ),
+            array(
+                'type'  =>  'text',
+                'label' =>  $this->l('Checkout URL'),
+                'name'  =>  'ra_checkout_url',
+                'desc'  =>  'Checkout URL'
+            ),
+        ),
+            'submit' => array(
+                'name' => 'submitTrackerOptions',
+                'title' => $this->l('Save')
+            )
+        );
 
         $helper = new HelperForm();
 
@@ -375,6 +449,7 @@ section.init .btn-init.btn-cta {
         $helper->fields_value['ra_qs_review'] = Configuration::get('ra_qs_review');
         $helper->fields_value['ra_qs_price'] = Configuration::get('ra_qs_price');
         $helper->fields_value['ra_qs_oldPrice'] = Configuration::get('ra_qs_oldPrice');
+        $helper->fields_value['ra_checkout_url'] = Configuration::get('ra_checkout_url');
 
         return $helper->generateForm($fields_form);
     }
@@ -491,11 +566,17 @@ section.init .btn-init.btn-cta {
                     <input type="text" name="ra_oqs_ldPrice" id="ra_qs_oldPrice" value="' . Tools::getValue('ra_qs_oldPrice', Configuration::get('ra_qs_oldPrice')) . '" class="">
                     <p class="clear"> [Experimental] Query selector for the main product price without discount on a product page. </p>
                 </div>
+                <label> Checkout Cart URL </label>
+                <div class="margin-form">
+                    <input type="text" name="ra_checkout_url" id="ra_checkout_url" value="' . Tools::getValue('ra_checkout_url', Configuration::get('ra_checkout_url')) . '" class="">
+                    <p class="clear"> If you have 3rd party plugin for checkout add here your cart URL. Must be the page where your clients can insert discount codes. (Default page is: http://yourdomain.com/order) </p>
+                </div>
                 
                 <center>
                     <button type="submit" value="1" id="configuration_form_submit_btn_2" name="submitTrackerOptions" class="btn btn-default pull-right"> <i class="process-icon-save"></i> Save </button>
                 </center>
-
+                
+                
             </fieldset>';
 
         // Form Tags
@@ -553,11 +634,21 @@ section.init .btn-init.btn-cta {
             $js_code .= $js_visitHelpPage;
         }
 
-        // checkoutIds
-        if ($this->controller == 'order' || $this->controller == 'orderopc') {
+        //custom checkoutURL && checkoutIds
+        if(Configuration::get('ra_checkout_url') != '') {
+            $current_url = _PS_BASE_URL_.$_SERVER['REQUEST_URI'];
+            $custom_url = Configuration::get('ra_checkout_url');
+
+            if($current_url == $custom_url) {
+                $js_setCartUrl = $this->_assignSetCartUrl();
+                $js_code .= $js_setCartUrl;
+                $js_checkoutIds = $this->_assignCheckoutIds();
+                $js_code .= $js_checkoutIds;
+
+            }
+        } elseif ($this->controller == 'order' || $this->controller == 'orderopc' || $this->controller == 'module-supercheckout-supercheckout') {
             $js_checkoutIds = $this->_assignCheckoutIds();
             $js_code .= $js_checkoutIds;
-
             $js_setCartUrl = $this->_assignSetCartUrl();
             $js_code .= $js_setCartUrl;
         }
