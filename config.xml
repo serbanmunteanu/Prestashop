@@ -2,7 +2,7 @@
 <module>
 	<name>retargetingtracker</name>
 	<displayName>Retargeting Tracker</displayName>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<description>Module implementing Retargeting tracker functions and also giving access to our awesome triggers.</description>
 	<author>Retargeting Team</author>
 	<tab>analytics_stats</tab>
