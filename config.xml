@@ -2,8 +2,8 @@
 <module>
 	<name>retargetingtracker</name>
 	<displayName>Retargeting Tracker</displayName>
-	<version>1.0.4</version>
-	<description>Module implementing Retargeting tracker functions and also giving access to our awesome triggers.</description>
+	<version>1.0.5</version>
+	<description>Retargeting is a marketing automation tool that boosts the conversion rate and sales of your online store.</description>
 	<author>Retargeting Team</author>
 	<tab>analytics_stats</tab>
 	<confirmUninstall>Are you sure you want to uninstall?</confirmUninstall>

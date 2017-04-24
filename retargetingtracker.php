@@ -45,7 +45,7 @@ class RetargetingTracker extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Retargeting Tracker');
-        $this->description = $this->l('Module implementing Retargeting tracker functions and also giving access to our awesome triggers.');
+        $this->description = $this->l('Retargeting is a marketing automation tool that boosts the conversion rate and sales of your online store.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -1075,10 +1075,13 @@ section.init .btn-init.btn-cta {
                 $product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
             }
 
+            $productName = htmlspecialchars($product_instance->name);
+            $productNameLangId = htmlspecialchars($product_instance->name[$this->context->language->id]);
+
             $js_code = 'var _ra = _ra || {};
                 _ra.sendProductInfo = {
                     "id": "' . $product_fields['id_product'] . '",
-                    "name": "' . (is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name) . '",
+                    "name": "' . (is_array($productName) ? $productNameLangId : $productName) . '",
                     "url": "' . $product_instance->getLink() . '", 
                     "img": "' . $raImg . '", 
                     "price": ' . $product_price . ',

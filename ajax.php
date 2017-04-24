@@ -95,7 +95,7 @@ function getThumbnailAddToCartJS($id)
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
 			"code": "' . $js_variationCode . '",
-			"stock": ' . ($product->available_now == 'In stock' ? 1 : 0) . ',
+			"stock": 1,
 			"details": {
 				' . $js_variationDetails . '
 			}
@@ -125,7 +125,7 @@ function getThumbnailAddToCartJS($id)
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
 			"code": "' . $js_variationCode . '",
-			"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+			"stock": 1,
 			"details": {
 				' . $js_variationDetails . '
 			}
@@ -216,7 +216,7 @@ function getProductAddToCartJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": ' . ($product->available_now == 'In stock' ? 1 : 0) . ',
+				"stock": 1,
 				"details": {
 					' . $js_variationDetails . '
 				}
@@ -247,7 +247,7 @@ function getProductAddToCartJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+				"stock": 1,
 				"details": {
 					' . $js_variationDetails . '
 				}
@@ -284,7 +284,7 @@ function getSetVariationJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": ' . ($product->available_now == 'In stock' ? 1 : 0) . ',
+				"stock": 1,
 				"details": {
 					' . $js_variationDetails . '
 				}
@@ -315,7 +315,7 @@ function getSetVariationJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+				"stock": 1,
 				"details": {
 					' . $js_variationDetails . '
 				}
