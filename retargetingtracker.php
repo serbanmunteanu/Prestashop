@@ -1,6 +1,6 @@
 <?php
 /**
- * 2014-2016 Retargeting BIZ SRL
+ * 2014-2017 Retargeting BIZ SRL
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Retargeting SRL <info@retargeting.biz>
- * @copyright 2014-2015 Retargeting SRL
+ * @copyright 2014-2017 Retargeting SRL
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -35,7 +35,7 @@ class RetargetingTracker extends Module
     {
         $this->name = 'retargetingtracker';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Retargeting Team';
         $this->module_key = '07f632866f76537ce3f8f01eedad4f00';
         $this->need_instance = 0;
@@ -45,7 +45,7 @@ class RetargetingTracker extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Retargeting Tracker');
-        $this->description = $this->l('Module implementing Retargeting tracker functions and also giving access to our awesome triggers.');
+        $this->description = $this->l('Retargeting is a marketing automation tool that boosts the conversion rate and sales of your online store.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -208,10 +208,10 @@ class RetargetingTracker extends Module
                 <article>
                     <!--<img src="imgs/logo-big.jpg">-->
                     <h1>Hello!</h1>
-                    <h2>To have access to our awesome features you need a <a href="https://retargeting.biz" target="_blank">Retargeting account</a>.</h2>
+                    <h2>To have access to our awesome features you need a <a href="https://retargeting.biz" target="_blank" rel="noopener noreferrer">Retargeting account</a>.</h2>
                     <div class="ra_row">
                         <button type="submit" value="1" id="configuration_form_submit_btn" name="submitDisableInit" class="btn-init btn-disableInit">I already have an account</button>
-                        <a href="https://retargeting.biz/signup" target="_blank"><div class="btn-init btn-cta">Start your 14-day Free Trial</div></a>
+                        <a href="https://retargeting.biz/signup" target="_blank" rel="noopener noreferrer"><div class="btn-init btn-cta">Start your 14-day Free Trial</div></a>
                     </div>
                 </article>
             
@@ -844,8 +844,8 @@ section.init .btn-init.btn-cta {
         $ra_domain_api_key = Configuration::get('ra_apikey');
         $ra_token = Configuration::get('ra_token');
 
-        if ($ra_domain_api_key && $ra_domain_api_key != '' && $ra_token && $ra_token != '') {
-            $client = new Retargeting_REST_API_Client($ra_domain_api_key, $ra_token);
+        if ($ra_token && $ra_token != '') {
+            $client = new Retargeting_REST_API_Client($ra_token);
             $client->setResponseFormat("json");
             $client->setDecoding(false);
 
@@ -873,6 +873,7 @@ section.init .btn-init.btn-cta {
 
         if ($ra_domain_api_key && $ra_domain_api_key != '') {
             $js_embedd = '
+                // Retargeting 49.54.x
                 (function(){
                 ra_key = "' . $ra_domain_api_key . '";
                 ra_params = {
@@ -1074,10 +1075,13 @@ section.init .btn-init.btn-cta {
                 $product_stock = (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0);
             }
 
+            $productName = htmlspecialchars($product_instance->name);
+            $productNameLangId = htmlspecialchars($product_instance->name[$this->context->language->id]);
+
             $js_code = 'var _ra = _ra || {};
                 _ra.sendProductInfo = {
                     "id": "' . $product_fields['id_product'] . '",
-                    "name": "' . (is_array($product_instance->name) ? $product_instance->name[$this->context->language->id] : $product_instance->name) . '",
+                    "name": "' . (is_array($productName) ? $productNameLangId : $productName) . '",
                     "url": "' . $product_instance->getLink() . '", 
                     "img": "' . $raImg . '", 
                     "price": ' . $product_price . ',
