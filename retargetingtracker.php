@@ -740,17 +740,17 @@ section.init .btn-init.btn-cta {
         $customer = $this->context->customer;
         $birthday = $this->context->customer->birthday;
         
-        if ($birthday == 'null') {
-          return '';
+        if ($birthday == 'null' || $birthday == '0000-00-00') {
+            $setEmailBirthday = '';
         } else {
-            $formattedBirthday = date("d-m-Y", strtotime($birthday));  
+            $setEmailBirthday = date("d-m-Y", strtotime($birthday));  
         }
 
         $js_code = 'var _ra = _ra || {};
             _ra.setEmailInfo = {
                 "email": "' . $customer->email . '",
                 "name": "' . $customer->firstname . ' ' . $customer->lastname . '",
-                "birthday": "' . $formattedBirthday . '"
+                "birthday": "' . $setEmailBirthday . '"
             };
             
             if (_ra.ready !== undefined) {
@@ -774,8 +774,8 @@ section.init .btn-init.btn-cta {
         $address = new Address((int)$order->id_address_delivery);
         $birthday = $this->context->customer->birthday;
         
-        if ($birthday == 'null') {
-          return '';
+        if ($birthday == 'null' || $birthday == '0000-00-00') {
+            $formattedBirthday = '';
         } else {
             $formattedBirthday = date("d-m-Y", strtotime($birthday));  
         }
