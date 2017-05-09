@@ -738,11 +738,19 @@ section.init .btn-init.btn-cta {
     protected function prepSetEmailJS()
     {
         $customer = $this->context->customer;
+        $birthday = $this->context->customer->birthday;
+        
+        if ($birthday == 'null') {
+          return '';
+        } else {
+            $formattedBirthday = date("d-m-Y", strtotime($birthday));  
+        }
 
         $js_code = 'var _ra = _ra || {};
             _ra.setEmailInfo = {
                 "email": "' . $customer->email . '",
-                "name": "' . $customer->firstname . ' ' . $customer->lastname . '"
+                "name": "' . $customer->firstname . ' ' . $customer->lastname . '",
+                "birthday": "' . $formattedBirthday . '"
             };
             
             if (_ra.ready !== undefined) {
@@ -764,6 +772,13 @@ section.init .btn-init.btn-cta {
         $discounts = $order->getCartRules();
         $customer = new Customer((int)$order->id_customer);
         $address = new Address((int)$order->id_address_delivery);
+        $birthday = $this->context->customer->birthday;
+        
+        if ($birthday == 'null') {
+          return '';
+        } else {
+            $formattedBirthday = date("d-m-Y", strtotime($birthday));  
+        }
 
         if (Validate::isLoadedObject($order) && Validate::isLoadedObject($customer)) {
             $paramsAPI = array('orderInfo' => null, 'orderProducts' => array());
@@ -802,6 +817,7 @@ section.init .btn-init.btn-cta {
                     "state": "' . (isset($address->id_state) ? State::getNameById($address->id_state) : '') . '",
                     "city": "' . $address->city . '",
                     "address": "' . $address->address1 . '",
+                    "birthday": "' . $formattedBirthday . '",
                     "discount": ' . $order->total_discounts . ',
                     "discount_code": "' . $discountsCode . '",
                     "shipping": ' . $order->total_shipping . ',
@@ -908,7 +924,8 @@ section.init .btn-init.btn-cta {
                 foreach ($categoryTree as $key => $categoryNode) {
                     if ($categoryNode['is_root_category']) {
                         continue;
-                    } elseif ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
+                    } elseif (
+                      $key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
                         $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false';
                     } elseif ($key == 0) {
                         $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"';
@@ -999,33 +1016,83 @@ section.init .btn-init.btn-cta {
                         if ($categoryNode['is_root_category']) {
                             continue;
                         } elseif ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
-                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                            $js_category = '
+                             "id": "' . $categoryNode['id_category'] . '", 
+                             "name": "' . $categoryNode['name'] . '", 
+                             "parent": false 
+                             ';
                         } elseif ($key == 0) {
-                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                            $js_category = '
+                             "id": "' . $categoryNode['id_category'] . '", 
+                             "name": "' . $categoryNode['name'] . '", 
+                             "parent": "' . $categoryNode['id_parent'] . '" 
+                             ';
                         } elseif (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) {
-                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                            $arr_categoryBreadcrumb[] = '{ 
+                              "id": "' . $categoryNode['id_category'] . '", 
+                              "name": "' . $categoryNode['name'] . '", 
+                              "parent": false 
+                            }';
                         } else {
-                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                            $arr_categoryBreadcrumb[] = '{ 
+                              "id": "' . $categoryNode['id_category'] . '", 
+                              "name": "' . $categoryNode['name'] . '", 
+                              "parent": "' . $categoryNode['id_parent'] . '" 
+                            }';
                         }
                     }
                 } else {
                     $categoryTree = $category_instance->getParentsCategories();
                     foreach ($categoryTree as $key => $categoryNode) {
                         if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
-                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                            $js_category = ' 
+                            "id": "' . $categoryNode['id_category'] . '", 
+                            "name": "' . $categoryNode['name'] . '", 
+                            "parent": false 
+                            ';
                         } elseif ($key == 0) {
-                            $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                            $js_category = ' 
+                            "id": "' . $categoryNode['id_category'] . '", 
+                            "name": "' . $categoryNode['name'] . '", 
+                            "parent": "' . $categoryNode['id_parent'] . '" 
+                            ';
                         } elseif ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
-                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                            $arr_categoryBreadcrumb[] = '{ 
+                              "id": "' . $categoryNode['id_category'] . '", 
+                              "name": "' . $categoryNode['name'] . '", 
+                              "parent": false 
+                            }'; 
                         } else {
-                            $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                            $arr_categoryBreadcrumb[] = '{ 
+                              "id": "' . $categoryNode['id_category'] . '", 
+                              "name": "' . $categoryNode['name'] . '", 
+                              "parent": "' . $categoryNode['id_parent'] . '" 
+                            }';
                         }
                     }
                 }
             }
 
             $js_categoryBreadcrumb = '[' . implode(', ', $arr_categoryBreadcrumb) . ']';
-            $js_category = '[{ ' . $js_category . ', breadcrumb: ' . $js_categoryBreadcrumb . ' }]';
+            
+            // In case the product has no category, return Home as default category
+            
+            if ($js_category == "false") {
+                $js_category = '[{
+                    "id": 1, 
+                    "name": "Home", 
+                    "parent": false,
+                    "breadcrumb": []
+                  }]'
+                  ;
+            } else {
+                $js_category = '[{
+                   ' . $js_category . ',
+                    "breadcrumb": ' . $js_categoryBreadcrumb . ' 
+                  }]';              
+            }
+            
+
 
             $imgDomain = _PS_BASE_URL_;
             if (_MEDIA_SERVER_1_ != null) {

@@ -95,7 +95,7 @@ function getThumbnailAddToCartJS($id)
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
 			"code": "' . $js_variationCode . '",
-			"stock": 1,
+			"stock": ' . ($product->available_now == true ? 1 : 0) . ',
 			"details": {
 				' . $js_variationDetails . '
 			}
@@ -125,7 +125,7 @@ function getThumbnailAddToCartJS($id)
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
 			"code": "' . $js_variationCode . '",
-			"stock": 1,
+			"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
 			"details": {
 				' . $js_variationDetails . '
 			}
@@ -153,7 +153,7 @@ function getThumbnailAddToCartJS($id)
             } else {
                 $product_promo = 0;
             }
-            $product_stock = ($product->available_now == 'In stock' ? 1 : 0);
+            $product_stock = ($product->available_now == true ? 1 : 0);
         } else {
             $product_price = $product->getPrice(true, null, 2, null, false, false);
             if ($product->getPrice(true, null, 2, null, false, false) > $product->getPrice(true, null, 2)) {
@@ -216,7 +216,7 @@ function getProductAddToCartJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": 1,
+				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
 				"details": {
 					' . $js_variationDetails . '
 				}
@@ -247,7 +247,7 @@ function getProductAddToCartJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": 1,
+				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
 				"details": {
 					' . $js_variationDetails . '
 				}
@@ -284,11 +284,12 @@ function getSetVariationJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": 1,
+				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
 				"details": {
 					' . $js_variationDetails . '
 				}
 			}';
+      
         }
     } else {
         $product = new Product($id, 1);
@@ -315,7 +316,7 @@ function getSetVariationJS($id, $vid)
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
 				"code": "' . $js_variationCode . '",
-				"stock": 1,
+				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
 				"details": {
 					' . $js_variationDetails . '
 				}

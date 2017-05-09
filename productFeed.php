@@ -48,5 +48,4 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
     }
     
     echo json_encode($retargetingFeed);
-    die();
 }    
