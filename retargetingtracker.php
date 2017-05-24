@@ -35,11 +35,11 @@ class RetargetingTracker extends Module
     {
         $this->name = 'retargetingtracker';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.5';
+        $this->version = '1.0.6';
         $this->author = 'Retargeting Team';
         $this->module_key = '07f632866f76537ce3f8f01eedad4f00';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = array('min' => '1.4', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->bootstrap = true;
 
         parent::__construct();
@@ -61,11 +61,11 @@ class RetargetingTracker extends Module
 
     public function install()
     {
-        if (_PS_VERSION_ >= '1.5' && Shop::isFeatureActive()) {
+        if (_PS_VERSION_ >= '1.6' && Shop::isFeatureActive()) {
             Shop::setContext(Shop::CONTEXT_ALL);
         }
 
-        if (_PS_VERSION_ >= '1.5') {
+        if (_PS_VERSION_ >= '1.6') {
             return parent::install() &&
             Configuration::updateValue('ra_apikey', '') &&
             Configuration::updateValue('ra_token', '') &&
@@ -411,7 +411,7 @@ section.init .btn-init.btn-cta {
 
         $helper = new HelperForm();
 
-        // Module, token and currentIndex
+        // Module, Token and currentIndex
         $helper->module = $this;
         $helper->name_controller = $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -654,7 +654,7 @@ section.init .btn-init.btn-cta {
         }
 
         // [block-begin] js that needs the DOM to be loaded
-        $js_code .= '$(document).ready(function() {';
+        $js_code .= '$(function() {';
 
         // addToCart
         $js_addToCart = $this->_assignAddToCart($this->controller);
@@ -677,14 +677,6 @@ section.init .btn-init.btn-cta {
             // commentOnProduct
             $js_commentOnProduct = $this->_assignCommentOnProduct();
             $js_code .= $js_commentOnProduct;
-
-            // // mouseOverPrice
-            // $js_mouseOverPrice = $this->_assignMouseOverPrice();
-            // $js_code .= $js_mouseOverPrice;
-
-            // // mouseOverAddToCart
-            // $js_mouseOverAddToCart = $this->_assignMouseOverAddToCart();
-            // $js_code .= $js_mouseOverAddToCart;
 
             // likeFacebook
             $js_likeFacebook = $this->_assignLikeFacebook();
@@ -790,9 +782,19 @@ section.init .btn-init.btn-cta {
                 $orderProductAttributes = (!empty($orderProduct['attributes_small']) ? str_replace(', ', '-', $orderProduct['attributes_small']) : '');
 
                 $orderProduct_instance = new Product((int)$orderProduct['id_product']);
-                $orderProducts[] = '{"id": "' . $orderProduct['id_product'] . '", "quantity": ' . $orderProduct['quantity'] . ', "price": ' . $orderProduct_instance->getPrice(true, null, 2) . ', "variation_code": "' . $orderProductAttributes . '"}';
+                $orderProducts[] = '{
+                  "id": "' . $orderProduct['id_product'] . '", 
+                  "quantity": ' . $orderProduct['quantity'] . ', 
+                  "price": ' . $orderProduct_instance->getPrice(true, null, 2) . ', 
+                  "variation_code": "' . $orderProductAttributes . '"
+                }';
 
-                $paramsAPI['orderProducts'][] = array('id' => $orderProduct['id_product'], 'quantity' => $orderProduct['quantity'], 'price' => $orderProduct_instance->getPrice(true, null, 2), 'variation_code' => $orderProductAttributes);
+                $paramsAPI['orderProducts'][] = array(
+                  'id' => $orderProduct['id_product'], 
+                  'quantity' => $orderProduct['quantity'], 
+                  'price' => $orderProduct_instance->getPrice(true, null, 2), 
+                  'variation_code' => $orderProductAttributes
+                );
             }
 
             $orderProducts = '[' . implode(', ', $orderProducts) . ']';
@@ -889,7 +891,7 @@ section.init .btn-init.btn-cta {
 
         if ($ra_domain_api_key && $ra_domain_api_key != '') {
             $js_embedd = '
-                // Retargeting 49.54.x
+                // Retargeting 49.54.x 1.0.6
                 (function(){
                 ra_key = "' . $ra_domain_api_key . '";
                 ra_params = {
@@ -899,6 +901,7 @@ section.init .btn-init.btn-cta {
                 var ra = document.createElement("script"); ra.type ="text/javascript"; ra.async = true; ra.src = ("https:" ==
                 document.location.protocol ? "https://" : "http://") + "tracking.retargeting.biz/v3/rajs/" + ra_key + ".js";
                 var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ra,s);})();
+                
             ';
         } else {
             $js_embedd = 'console.info("Retargeting Tracker: please set the Tracking API Key.");';
@@ -919,33 +922,65 @@ section.init .btn-init.btn-cta {
         $arr_categoryBreadcrumb = array();
 
         if (Validate::isLoadedObject($category_instance)) {
-            if (_PS_VERSION_ >= '1.5') {
+            if (_PS_VERSION_ >= '1.6') {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
                     if ($categoryNode['is_root_category']) {
                         continue;
                     } elseif (
                       $key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
-                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false';
+                        $js_category = '
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": false
+                        ';
                     } elseif ($key == 0) {
-                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"';
+                        $js_category = '
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": "' . $categoryNode['id_parent'] . '"
+                        ';
                     } elseif (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": false 
+                          }';
                     } else {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": "' . $categoryNode['id_parent'] . '" 
+                        }';
                     }
                 }
             } else {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
                     if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
-                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false';
+                        $js_category = '
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": false
+                        ';
                     } elseif ($key == 0) {
-                        $js_category = '"id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '"';
+                        $js_category = '
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": "' . $categoryNode['id_parent'] . '"
+                        ';
                     } elseif ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": false 
+                        }';
                     } else {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": "' . $categoryNode['id_parent'] . '" 
+                        }';
                     }
                 }
             }
@@ -1010,7 +1045,7 @@ section.init .btn-init.btn-cta {
             $arr_categoryBreadcrumb = array();
 
             if (Validate::isLoadedObject($category_instance)) {
-                if (_PS_VERSION_ >= '1.5') {
+                if (_PS_VERSION_ >= '1.6') {
                     $categoryTree = $category_instance->getParentsCategories();
                     foreach ($categoryTree as $key => $categoryNode) {
                         if ($categoryNode['is_root_category']) {
@@ -1083,8 +1118,7 @@ section.init .btn-init.btn-cta {
                     "name": "Home", 
                     "parent": false,
                     "breadcrumb": []
-                  }]'
-                  ;
+                  }]';
             } else {
                 $js_category = '[{
                    ' . $js_category . ',
@@ -1107,7 +1141,7 @@ section.init .btn-init.btn-cta {
             $id_image = Product::getCover($product_fields['id_product']);
             if (sizeof($id_image) > 0) {
                 $image = new Image($id_image['id_image']);
-                if (_PS_VERSION_ >= '1.5') {
+                if (_PS_VERSION_ >= '1.6') {
                     $product_image = $imgDomain . _THEME_PROD_DIR_ . $image->getExistingImgPath() . "-" . ImageType::getFormatedName('large') . ".jpg";
                 } else {
                     $product_image = _PS_BASE_URL_ . _THEME_PROD_DIR_ . $image->id_product . "-" . $image->id_image . "-large.jpg";
@@ -1123,7 +1157,7 @@ section.init .btn-init.btn-cta {
             $iType = ImageType::getFormatedName('large');
             $raImg = $iProt . $link_instance->getImageLink($product_instance->link_rewrite, $product_instance->id . '-' . $id_image['id_image'], $iType);
 
-            if (_PS_VERSION_ >= '1.5') {
+            if (_PS_VERSION_ >= '1.6') {
 
                 $vat = $product_instance->tax_rate;
                 $vat_value = ((100 + $vat) / 100);
@@ -1297,7 +1331,7 @@ section.init .btn-init.btn-cta {
         if (Validate::isLoadedObject($product_instance)) {
             $product_fields = $product_instance->getFields();
 
-            if (_PS_VERSION_ >= '1.5') {
+            if (_PS_VERSION_ >= '1.6') {
                 $vat = $product_instance->tax_rate;
                 $vat_value = ((100 + $vat) / 100); // default value
 
@@ -1437,8 +1471,8 @@ section.init .btn-init.btn-cta {
 
     protected function getCurrentController()
     {
-        // For Prestashop v1.5 and ..
-        if (_PS_VERSION_ >= '1.5') {
+        // For Prestashop v1.6 and newer
+        if (_PS_VERSION_ >= '1.6') {
             return Dispatcher::getInstance()->getController();
         }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2014-2015 Retargeting SRL
+ * 2014-2017 Retargeting SRL
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Retargeting SRL <info@retargeting.biz>
- * @copyright 2014-2015 Retargeting SRL
+ * @copyright 2014-2017 Retargeting SRL
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -46,26 +46,58 @@ function getThumbnailAddToCartJS($id)
                     if ($categoryNode['is_root_category']) {
                         continue;
                     } elseif ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) || !isset($categoryTree[$key + 1]))) {
-                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                        $js_category = ' 
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": false 
+                        ';
                     } elseif ($key == 0) {
-                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                        $js_category = ' 
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": "' . $categoryNode['id_parent'] . '" 
+                        ';
                     } elseif (isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['is_root_category']) {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": false 
+                        }';
                     } else {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": "' . $categoryNode['id_parent'] . '" 
+                        }';
                     }
                 }
             } else {
                 $categoryTree = $category_instance->getParentsCategories();
                 foreach ($categoryTree as $key => $categoryNode) {
                     if ($key == 0 && ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1]))) {
-                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false ';
+                        $js_category = ' 
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": false 
+                        ';
                     } else if ($key == 0) {
-                        $js_category = ' "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" ';
+                        $js_category = ' 
+                        "id": "' . $categoryNode['id_category'] . '", 
+                        "name": "' . $categoryNode['name'] . '", 
+                        "parent": "' . $categoryNode['id_parent'] . '" 
+                        ';
                     } else if ((isset($categoryTree[$key + 1]) && $categoryTree[$key + 1]['level_depth'] < 1) || !isset($categoryTree[$key + 1])) {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": false }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": false 
+                        }';
                     } else {
-                        $arr_categoryBreadcrumb[] = '{ "id": "' . $categoryNode['id_category'] . '", "name": "' . $categoryNode['name'] . '", "parent": "' . $categoryNode['id_parent'] . '" }';
+                        $arr_categoryBreadcrumb[] = '{ 
+                          "id": "' . $categoryNode['id_category'] . '", 
+                          "name": "' . $categoryNode['name'] . '", 
+                          "parent": "' . $categoryNode['id_parent'] . '" 
+                        }';
                     }
                 }
             }
@@ -86,20 +118,20 @@ function getThumbnailAddToCartJS($id)
                         $productAtttribute['name'] = str_replace('-', ' ', $productAtttribute['name']);
                         $arr_variationCode[] = $productAtttribute['name'];
                         $arr_variationDetails[] = '"' . $productAtttribute['name'] . '": {
-					"category_name": "' . $productAtttribute['group'] . '",
-					"category": "' . $productAtttribute['group'] . '",
-					"value": "' . $productAtttribute['name'] . '"
-				}';
+                  					"category_name": "' . $productAtttribute['group'] . '",
+                  					"category": "' . $productAtttribute['group'] . '",
+                  					"value": "' . $productAtttribute['name'] . '"
+                  				}';
                     }
                     $js_variationCode = implode('-', $arr_variationCode);
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
-			"code": "' . $js_variationCode . '",
-			"stock": ' . ($product->available_now == true ? 1 : 0) . ',
-			"details": {
-				' . $js_variationDetails . '
-			}
-		}';
+                  			"code": "' . $js_variationCode . '",
+                  			"stock": ' . ($product->available_now == true ? 1 : 0) . ',
+                  			"details": {
+                  				' . $js_variationDetails . '
+                  			}
+                  		}';
         }
             } else {
                 $product = new Product($id, 1);
@@ -114,22 +146,22 @@ function getThumbnailAddToCartJS($id)
                             $productAtttribute['attribute_name'] = str_replace('-', ' ', $productAtttribute['attribute_name']);
                             $arr_variationCode[] = $productAtttribute['attribute_name'];
                             $arr_variationDetails[] = '"' . $productAtttribute['attribute_name'] . '": {
-				"category_name": "' . $productAtttribute['group_name'] . '",
-				"category": "' . $productAtttribute['group_name'] . '",
-				"value": "' . $productAtttribute['attribute_name'] . '"
-								}
-								';
+                        				"category_name": "' . $productAtttribute['group_name'] . '",
+                        				"category": "' . $productAtttribute['group_name'] . '",
+                        				"value": "' . $productAtttribute['attribute_name'] . '"
+                        								}
+                        								';
                         }
                     }
                     $js_variationCode = implode('-', $arr_variationCode);
                     $js_variationDetails = implode(', ', $arr_variationDetails);
                     $js_variation = '{
-			"code": "' . $js_variationCode . '",
-			"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
-			"details": {
-				' . $js_variationDetails . '
-			}
-		}';
+                  			"code": "' . $js_variationCode . '",
+                  			"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+                  			"details": {
+                  				' . $js_variationDetails . '
+                  			}
+                  		}';
                 }
             }
         }
@@ -206,21 +238,21 @@ function getProductAddToCartJS($id, $vid)
                 $productAtttribute['name'] = str_replace('-', ' ', $productAtttribute['name']);
                 $arr_variationCode[] = $productAtttribute['name'];
                 $arr_variationDetails[] = '"' . $productAtttribute['name'] . '": {
-						"category_name": "' . $productAtttribute['group'] . '",
-						"category": "' . $productAtttribute['group'] . '",
-						"value": "' . $productAtttribute['name'] . '"
-					}
-					';
+        						"category_name": "' . $productAtttribute['group'] . '",
+        						"category": "' . $productAtttribute['group'] . '",
+        						"value": "' . $productAtttribute['name'] . '"
+        					}
+        					';
             }
             $js_variationCode = implode('-', $arr_variationCode);
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
-				"code": "' . $js_variationCode . '",
-				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
-				"details": {
-					' . $js_variationDetails . '
-				}
-			}';
+        				"code": "' . $js_variationCode . '",
+        				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
+        				"details": {
+        					' . $js_variationDetails . '
+        				}
+        			}';
         }
     } else {
         $product = new Product($id, 1);
@@ -236,22 +268,22 @@ function getProductAddToCartJS($id, $vid)
                     $productAtttribute['attribute_name'] = str_replace('-', ' ', $productAtttribute['attribute_name']);
                     $arr_variationCode[] = $productAtttribute['attribute_name'];
                     $arr_variationDetails[] = '"' . $productAtttribute['attribute_name'] . '": {
-							"category_name": "' . $productAtttribute['group_name'] . '",
-							"category": "' . $productAtttribute['group_name'] . '",
-							"value": "' . $productAtttribute['attribute_name'] . '"
-						}
-						';
+          							"category_name": "' . $productAtttribute['group_name'] . '",
+          							"category": "' . $productAtttribute['group_name'] . '",
+          							"value": "' . $productAtttribute['attribute_name'] . '"
+          						}
+          						';
                 }
             }
             $js_variationCode = implode('-', $arr_variationCode);
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
-				"code": "' . $js_variationCode . '",
-				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
-				"details": {
-					' . $js_variationDetails . '
-				}
-			}';
+        				"code": "' . $js_variationCode . '",
+        				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+        				"details": {
+        					' . $js_variationDetails . '
+        				}
+        			}';
         }
     }
 
@@ -274,21 +306,21 @@ function getSetVariationJS($id, $vid)
                 $productAtttribute['name'] = str_replace('-', ' ', $productAtttribute['name']);
                 $arr_variationCode[] = $productAtttribute['name'];
                 $arr_variationDetails[] = '"' . $productAtttribute['name'] . '": {
-						"category_name": "' . $productAtttribute['group'] . '",
-						"category": "' . $productAtttribute['group'] . '",
-						"value": "' . $productAtttribute['name'] . '"
-					}
-					';
+        						"category_name": "' . $productAtttribute['group'] . '",
+        						"category": "' . $productAtttribute['group'] . '",
+        						"value": "' . $productAtttribute['name'] . '"
+        					}
+        					';
             }
             $js_variationCode = implode('-', $arr_variationCode);
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
-				"code": "' . $js_variationCode . '",
-				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
-				"details": {
-					' . $js_variationDetails . '
-				}
-			}';
+        				"code": "' . $js_variationCode . '",
+        				"stock": ' . ($product->available_now == true ? 1 : 0) . ',
+        				"details": {
+        					' . $js_variationDetails . '
+        				}
+        			}';
       
         }
     } else {
@@ -305,22 +337,22 @@ function getSetVariationJS($id, $vid)
                     $productAtttribute['attribute_name'] = str_replace('-', ' ', $productAtttribute['attribute_name']);
                     $arr_variationCode[] = $productAtttribute['attribute_name'];
                     $arr_variationDetails[] = '"' . $productAtttribute['attribute_name'] . '": {
-							"category_name": "' . $productAtttribute['group_name'] . '",
-							"category": "' . $productAtttribute['group_name'] . '",
-							"value": "' . $productAtttribute['attribute_name'] . '"
-						}
-						';
+          							"category_name": "' . $productAtttribute['group_name'] . '",
+          							"category": "' . $productAtttribute['group_name'] . '",
+          							"value": "' . $productAtttribute['attribute_name'] . '"
+          						}
+          						';
                 }
             }
             $js_variationCode = implode('-', $arr_variationCode);
             $js_variationDetails = implode(', ', $arr_variationDetails);
             $js_variation = '{
-				"code": "' . $js_variationCode . '",
-				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
-				"details": {
-					' . $js_variationDetails . '
-				}
-			}';
+        				"code": "' . $js_variationCode . '",
+        				"stock": ' . (Product::getQuantity($product_fields['id_product']) > 0 ? 1 : 0) . ',
+        				"details": {
+        					' . $js_variationDetails . '
+        				}
+        			}';
         }
     }
 
