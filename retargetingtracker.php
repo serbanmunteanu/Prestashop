@@ -765,6 +765,8 @@ section.init .btn-init.btn-cta {
         $customer = new Customer((int)$order->id_customer);
         $address = new Address((int)$order->id_address_delivery);
         $birthday = $this->context->customer->birthday;
+        $homePhone = $address->phone;  
+        $mobilePhone = $address->phone_mobile;
         
         if ($birthday == 'null' || $birthday == '0000-00-00') {
             $formattedBirthday = '';
@@ -815,7 +817,7 @@ section.init .btn-init.btn-cta {
                     "lastname": "' . $address->lastname . '",
                     "firstname": "' . $address->firstname . '",
                     "email": "' . $customer->email . '",
-                    "phone": "' . ($address->phone == '' ? $address->phone : $address->phone_mobile) . '",
+                    "phone": "' . ($homePhone !== '' ? $homePhone : $mobilePhone) . '",
                     "state": "' . (isset($address->id_state) ? State::getNameById($address->id_state) : '') . '",
                     "city": "' . $address->city . '",
                     "address": "' . $address->address1 . '",
@@ -833,13 +835,13 @@ section.init .btn-init.btn-cta {
                     _ra.saveOrder(_ra.saveOrderInfo, _ra.saveOrderProducts);
                 }
             ';
-
+            var_dump($address->phone);
             $paramsAPI['orderInfo'] = array(
                 'order_no' => $order->id,
                 'lastname' => $address->lastname,
                 'firstname' => $address->firstname,
                 'email' => $customer->email,
-                'phone' => ($address->phone == '' ? $address->phone : $address->phone_mobile),
+                'phone' => ($homePhone !== '' ? $homePhone : $mobilePhone),
                 'state' => (isset($address->id_state) ? State::getNameById($address->id_state) : ''),
                 'city' => $address->city,
                 'address' => $address->address1,
