@@ -835,7 +835,7 @@ section.init .btn-init.btn-cta {
                     _ra.saveOrder(_ra.saveOrderInfo, _ra.saveOrderProducts);
                 }
             ';
-            var_dump($address->phone);
+
             $paramsAPI['orderInfo'] = array(
                 'order_no' => $order->id,
                 'lastname' => $address->lastname,
