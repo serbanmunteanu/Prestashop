@@ -40,7 +40,7 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
             'promo_price_end_date' => null,
             'inventory' => array(
                 'variations' => false,
-                'stock' = > $product_stock
+                'stock' => $product_stock
             ),
             'user_groups' => false,
             'product_availability' => null
