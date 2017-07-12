@@ -34,7 +34,7 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
     
     foreach ($products as $product) {
         $retargetingFeed[] = array(
-            'id' = > $product_fields['id_product'],
+            'id' => $product_fields['id_product'],
             'price' => $product_price,
             'promo' => $product_promo,
             'promo_price_end_date' => null,
@@ -42,8 +42,8 @@ if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_ke
                 'variations' => false,
                 'stock' = > $product_stock
             ),
-            'user_groups' = false,
-            'product_availability' = null
+            'user_groups' => false,
+            'product_availability' => null
         );
     }
     
