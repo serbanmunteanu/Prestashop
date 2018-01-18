@@ -27,10 +27,88 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+class Recommendation_engine_hook
+{
+     const ELEMENT = '<div id="%s"><img src="http://i0.kym-cdn.com/entries/icons/original/000/021/807/4d7.png"></div>';
+
+     public static function get_id($id)
+     {
+        if($id)
+        {
+          return sprintf(self::ELEMENT,$id);
+        }
+     }
+
+}
+
 include(dirname(__FILE__) . '/lib/retargeting-rest-api/Client.php');
 
 class RetargetingTracker extends Module
-{
+{   
+    protected static $customHooks = array(
+        array(
+            'name' => 'displayTopHome',
+            'title' => 'HomePage Top',
+            'description' => 'Add new blocks above the category product list',
+        ),
+        array(
+            'name' => 'displayFooterHome',
+            'title' => 'HomePage footer',
+            'description' => 'Add new blocks below the category product list',
+        ),
+        array(
+            'name' => 'displayTopSearch',
+            'title' => 'Search top',
+            'description' => 'Add new blocks above the search result list.',
+        ),
+        array(
+            'name' => 'displayFooterSearch',
+            'title' => 'Search footer',
+            'description' => 'Add new blocks below the search result list.',
+        ),
+        array(
+            'name' => 'displayTopCategory',
+            'title' => 'CategoryPage Top',
+            'description' => 'Action hook fired after a Nosto cart object has been loaded.',
+        ),
+        array(
+            'name' => 'displayFooterCategory',
+            'title' => 'CategoryPage Footer',
+            'description' => 'Action hook fired after a Nosto order object has been loaded.',
+        ),
+        array(
+            'name' => 'displayTopProduct',
+            'title' => 'ProductPage Top',
+            'description' => 'Action hook fired after a Nosto product object has been loaded.',
+        ),
+        array(
+            'name' => 'displayFooterProduct',
+            'title' => 'ProductPage Footer',
+            'description' => 'Action hook fired after a Nosto price variation object has been initialized.',
+        ),
+        array(
+            'name' => 'displayFooterCheckout',
+            'title' => 'CheckoutPage Footer',
+            'description' => 'Action hook fired after a Nosto exchange rate collection has been initialized.',
+        ),
+        array(
+            'name' => 'displayFooterThankyou',
+            'title' => 'ThankyouPage Footer',
+            'description' => 'Action hook fired after a Nosto variation key collection has been initialized.',
+        ),
+        array(
+            'name' => 'displayFooterOutOfStock',
+            'title' => 'OutOfStockPage Footer',
+            'description' => 'Action hook fired after a Nosto variation key collection has been initialized.',
+        ),
+        array(
+            'name' => 'displayFooter404',
+            'title' => '404Page Footer',
+            'description' => 'Action hook fired after a Nosto variation key collection has been initialized.',
+        ),
+    );
+
+
     public function __construct()
     {
         $this->name = 'retargetingtracker';
@@ -86,7 +164,19 @@ class RetargetingTracker extends Module
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayOrderConfirmation') &&
             $this->registerHook('actionAuthentication') &&
-            $this->registerHook('actionCustomerAccountAdd');
+            $this->registerHook('actionCustomerAccountAdd') &&
+            $this->registerHook('displayTopHome') &&
+            $this->registerHook('displayFooterHome') &&
+            $this->registerHook('displayTopCategory') &&
+            $this->registerHook('displayFooterCategory') &&
+            $this->registerHook('displayTopProduct') &&
+            $this->registerHook('displayFooterProduct') &&
+            $this->registerHook('displayFooterCheckout') &&
+            $this->registerHook('displayFooterThankyou') &&
+            $this->registerHook('displayFooterOutOfStock') &&
+            $this->registerHook('displayTopSearch') &&
+            $this->registerHook('displayFooterSearch') &&
+            $this->registerHook('displayFooter404');
         } else {
             return parent::install() &&
             Configuration::updateValue('ra_apikey', '') &&
@@ -106,7 +196,19 @@ class RetargetingTracker extends Module
             $this->registerHook('header') &&
             $this->registerHook('orderConfirmation') &&
             $this->registerHook('authentication') &&
-            $this->registerHook('createAccount');
+            $this->registerHook('createAccount') &&
+            $this->registerHook('displayTopHome') &&
+            $this->registerHook('displayFooterHome') &&
+            $this->registerHook('displayTopCategory') &&
+            $this->registerHook('displayFooterCategory') &&
+            $this->registerHook('displayTopProduct') &&
+            $this->registerHook('displayFooterProduct') &&
+            $this->registerHook('displayFooterCheckout') &&
+            $this->registerHook('displayFooterThankyou') &&
+            $this->registerHook('displayFooterOutOfStock') &&
+            $this->registerHook('displayTopSearch') &&
+            $this->registerHook('displayFooterSearch') &&
+            $this->registerHook('displayFooter404') ;
         }
     }
 
@@ -688,7 +790,120 @@ section.init .btn-init.btn-cta {
 
         return $this->_runJs($js_code);
     }
+    /*
+       
+      ---------->Recommendation Engine for  Home Page <------------------
 
+      */
+
+      public function hookDisplayTopHome() 
+      {
+         return self::get("retargeting-recommeng-home-page");
+      }     
+      
+       public function hookDisplayFooterHome() 
+      {
+         return $this->hookDisplayTopHome();
+      }
+      /*
+       
+      ---------->Recommendation Engine for Category Page <-------------------
+
+      */
+
+      public function hookDisplayTopCategory() 
+      {
+         return self::get("retargeting-recommeng-category-page");
+      }
+
+      public function hookDisplayFooterCategory() 
+      {
+         return $this->hookDisplayTopCategory();
+      }
+       /*
+       
+      ---------->Recommendation Engine for  Product Page <------------------
+
+      */
+
+      public function hookDisplayTopProduct() 
+      {
+         return self::get("retargeting-recommeng-product-page");
+      }
+      public function hookTopProduct()
+      {
+        return $this->hookDisplayTopProduct();
+
+      }
+
+      public function hookDisplayFooterProduct() 
+      {
+         return $this->hookDisplayTopProduct();
+      }
+       /*
+       
+      ---------->Recommendation Engine for  Checkout Page <------------------
+
+      */
+
+      public function hookDisplayFooterCheckout() 
+      {
+         return self::get("retargeting-recommeng-checkout-page");
+      }
+      
+       /*
+       
+      ---------->Recommendation Engine for  Thankyou Page <------------------
+
+      */
+
+      public function hookDisplayFooterThankyou() 
+      {
+         return self::get("retargeting-recommeng-thank-you-page");
+      }
+      
+       /*
+       
+      ---------->Recommendation Engine for Out Of Stock Page <---------------
+
+      */
+
+      public function hookDisplayFooterOutOfStock() 
+      {
+         return self::get("retargeting-recommeng-out-of-stock-page");
+      }
+      
+      /*
+       
+      ---------->Recommendation Engine for Search Page <---------------
+
+      */
+
+
+      public function hookDisplayTopSearch() 
+      {
+         return self::get("retargeting-recommeng-search-page");
+      }
+      
+      public function hookDisplayFooterSearch() 
+      {
+         return $this>hookDisplayTopSearch();
+       }      
+      /*
+       
+      ---------->Recommendation Engine for Not Found Page <---------------
+
+      */
+
+      public function hookDisplayFooter404() 
+      {
+         return self::get("retargeting-recommeng-not-found-page");
+      }
+
+    /**
+     * Functions _assign[::retargeting_trigger::]
+     * ----------------------------------------------------------
+     */
 
     /**
      * Specific hooks
