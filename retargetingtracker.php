@@ -33,7 +33,7 @@ include(dirname(__FILE__) . '/lib/retargeting-rest-api/Client.php');
 
 class RetargetingTracker extends Module
 {   
-    const ELEMENT = '<div id="%s"><img src="http://i0.kym-cdn.com/entries/icons/original/000/021/807/4d7.png"></div>';
+    const ELEMENT = '<div id="%s"></div>';
 
        public function __construct()
     {
