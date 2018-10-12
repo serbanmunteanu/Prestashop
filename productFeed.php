@@ -1,6 +1,6 @@
 <?php
 /**
- * 2014-2017 Retargeting SRL
+ * 2014-2018 Retargeting SRL
  *
  * NOTICE OF LICENSE
  *
@@ -19,33 +19,31 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Retargeting SRL <info@retargeting.biz>
- * @copyright 2014-2017 Retargeting SRL
+ * @copyright 2014-2018 Retargeting SRL
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 
-$ra_domain_api_key = Configuration::get('ra_apikey');
+$products = ProductCore::getProducts(1, 0, 0, "id_product", "asc");
+$array = [];
 
-if ((Tools::getValue('key') != '' && Tools::getValue('key') == $ra_domain_api_key) || $ra_domain_api_key == 'allowFeed') {
-    $products = Product::getProducts(1, 0, 0, "id_product", "desc");
-    $retargetingFeed = array();
-    
-    foreach ($products as $product) {
-        $retargetingFeed[] = array(
-            'id' => $product_fields['id_product'],
-            'price' => $product_price,
-            'promo' => $product_promo,
+foreach ($products as $product => $value) {
+
+        $retargetingFeed = [
+            'id' => $value['id_product'],
+            'price' => number_format((float)$value['price'], 2, '.', ''),
+            'promo' => number_format((float)$value['wholesale_price'], 2, '.', ''),
             'promo_price_end_date' => null,
-            'inventory' => array(
+            'inventory' => [
                 'variations' => false,
-                'stock' => $product_stock
-            ),
+                'stock' => ProductCore::getQuantity($value['id_product']) > 0 ? true : false
+            ],
             'user_groups' => false,
             'product_availability' => null
-        );
-    }
+        ];
+        $array[] = $retargetingFeed;
+}
     
-    echo json_encode($retargetingFeed);
-}    
+echo json_encode($array);
